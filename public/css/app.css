@@ -44067,6 +44067,82 @@ input:invalid, textarea:invalid, select:invalid {
   direction: rtl;
 }
 
+.ltr {
+  direction: ltr;
+}
+
+.gemara-case div {
+  margin-right: 0.5rem;
+}
+
+.gemara-case label {
+  margin-right: 0.5rem;
+}
+
+.gc-diagram > div {
+  text-align: center;
+  height: 12rem;
+  width: 100%;
+  display: flex;
+}
+
+.arrow-head {
+  border-width: 1em;
+  border-right-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: #3f83f8;
+  height: 0;
+  width: 0;
+}
+
+.diagram-ellipse {
+  --border-opacity: 1;
+  border-color: #1c64f2;
+  border-color: rgba(28, 100, 242, var(--border-opacity));
+  border-width: 2px;
+  --bg-opacity: 1;
+  background-color: #fce96a;
+  background-color: rgba(252, 233, 106, var(--bg-opacity));
+  justify-content: center;
+  font-size: 0.75rem;
+  width: 100%;
+  border-radius: 50%/50%;
+  height: 50% !important;
+}
+
+.gc-act {
+  grid-column: span 4 / span 4;
+  align-items: flex-end;
+  width: 50% !important;
+}
+
+.gc-act .diagram-ellipse {
+  --bg-opacity: 1;
+  background-color: #cabffd;
+  background-color: rgba(202, 191, 253, var(--bg-opacity));
+}
+
+.gc-consequences, .gc-how {
+  align-items: flex-end;
+}
+
+.gc-when, .gc-with-what {
+  align-items: center;
+}
+
+.arrow {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.arrow__path {
+  stroke: blue;
+  fill: transparent;
+  stroke-dasharray: 0;
+  stroke-width: 2;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;

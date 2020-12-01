@@ -16,6 +16,6 @@ class Home extends Controller
     {
         $masechtot = \App\Models\Tractate::all();
 
-        return view('welcome')->with('masechtot', $masechtot);
+        return view('welcome')->with('masechtot', $masechtot)->with('hideIcons', $request->query('hideicons'));
     }
 }

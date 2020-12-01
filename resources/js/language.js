@@ -25,6 +25,11 @@ window.languageToggle = () => {
 
         toggleLanguage() {
             this.selectedLanguage = (this.selectedLanguage === 'English') ? 'Hebrew' : 'English';
+        },
+
+        setTitle(hebrewTitle, englishTitle) {
+            this.englishTexts.pageTitle = englishTitle;
+            this.hebrewTexts.pageTitle = hebrewTitle;
         }
     }
 }

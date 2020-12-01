@@ -1,13 +1,11 @@
 import 'alpinejs';
 import './language';
 import './gemara_case';
+import { initArrows, resetArrows } from './arrows';
 
 window.changeLanguage = () => {
     window.dispatchEvent( new CustomEvent('togglelanguage', { detail: 'toggle' }) );
 }
-
-
-
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
