@@ -10,70 +10,84 @@
             x-init="getMasechtot()"
             :class="{'rtl': selectedLanguage === 'Hebrew'} "
             @togglelanguage.window="toggleLanguage()"
+            x-cloak
         >
-            {!! Form::open() !!}
+            <form @submit.prevent="submitData" method="POST">
                 <div class="flex gemara-case max-w-screen-xl mx-auto"
-                    :class="{'justify-between' : selectedText}"
+                    :class="{'justify-between' : theCase.text}"
                 >
                     <div class="flex">
                         <div class="">
-                            {{-- <label for='masechet' class="" x-text="localizedTexts.masechetLabel"></label> --}}
-                            <select x-show='!selectedMasechet' x-model='selectedMasechet' @change='selectMasechet()'>
+                            <select x-show='!theCase.masechet' x-model='theCase.masechet' @change='selectMasechet()'>
                                 <option value="" x-text="localizedTexts.selectMasechet"></option>
                                 <template x-for="masechet in masechtot">
                                     <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
                                 </template>
                             </select>
-                            <span x-show="selectedMasechet"
-                                @dblclick="resetCase()"
-                                class="border-b-2 border-dashed"
-                                x-text="masechetName"></span>
+                            @include('subviews.clickable-text',
+                                     ['show' => 'theCase.masechet',
+                                      'dblClick' => 'resetCase()',
+                                      'text' => 'masechetName'])
                         </div>
 
-                        <div class="" x-show="selectedMasechet">
+                        <div class="" x-show="theCase.masechet">
                             {{-- <label for='daf' class="" x-text="localizedTexts.masechetLabel"></label> --}}
-                            <select x-show="!selectedDaf" x-model='selectedDaf' @change="amudText = ''">
+                            <select x-show="!theCase.daf" x-model='theCase.daf' @change="amudText = ''">
                                 <template x-for="daf in dapim">
                                     <option :key="daf.value" :value="daf.value" x-text="daf.text">
                                 </template>
                             </select>
-                            <span x-show="selectedDaf"
-                                @dblclick="resetDaf()"
-                                class="border-b-2 border-dashed"
-                                x-text="dafAsText"></span>
+                            @include('subviews.clickable-text',
+                                     ['show' => 'theCase.daf',
+                                      'dblClick' => 'resetDaf()',
+                                      'text' => 'dafAsText'])
                         </div>
 
-                        <div x-show="selectedDaf && !selectedText" class="flex">
+                        <div x-show="theCase.daf && !theCase.text" class="flex">
                             <textarea rows="2"
                                 cols="20"
-                                @blur="selectedText = tmpSelectedText"
+                                @blur="theCase.text = tmpSelectedText"
                                 class="border-gray-400 border-2 rounded-sm focus:outline-none rtl"
                                 x-model="tmpSelectedText">
                             </textarea>
                             <button @click="getAmudText()" type="button">
                                 <img src="{{ asset('storage/images/amud-text.png')}}"
                                     class="h-8 w-8"
-                                    x-bind:alt="localizedTexts.showAmudText"
+                                    :alt="localizedTexts.showAmudText"
                                     >
                             </button>
-                            @livewire('modal', ['showFlag' => 'amudText', 'modalContent' => 'amudText', 'clickAway' => 'amudText=false'])
+                            @include('subviews.modal',
+                                     ['showFlag' => 'amudText',
+                                      'modalContent' => 'amudText',
+                                      'classes' => 'rtl',
+                                      'clickAway' => 'amudText=false'])
                         </div>
 
-                        <div x-show="selectedText"
-                            @dblclick="selectedText=''"
+                        <div x-show="theCase.text"
+                            @dblclick="theCase.text=''"
                             class="rtl max-w-md border-b-2 border-dashed"
-                            x-text="selectedText">
+                            x-text="theCase.text">
                         </div>
                     </div>
 
-                    <div x-show="selectedText">
+                    <div x-show="theCase.text" class="flex">
                         <input type="text"
-                            x-model="caseTitle"
-                            class="pl-1"
-                            x-bind:placeholder="localizedTexts.titleLabel">
+                            x-model="theCase.title"
+                            class="pl-1 inline-block align-middle mr-4"
+                            :placeholder="localizedTexts.titleLabel">
+                        <div>
+                            <input type="checkbox"
+                                class="inline-block align-middle"
+                                x-model="theCase.public">
+                            <label class="inline-block align-middle">
+                                Pubic
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div x-show="selectedText" class="ltr gc-diagram grid grid-cols-6 gap-x-8 gap-y-24 justify-items-center border-4 border-blue-500 p-4 mt-4 max-w-screen-xl mx-auto">
+                <div x-show="theCase.text"
+                    class="ltr gc-diagram grid grid-cols-6 gap-x-8 gap-y-24 justify-items-center border-4 border-blue-500 p-4 mt-4 max-w-screen-xl mx-auto"
+                >
 
 @php
 $pieces = [
@@ -84,62 +98,79 @@ $pieces = [
     "withWhat",
     "how",
     "other",
-    "act",
     "who",
 ];
 @endphp
 
 @foreach ($pieces as $piece)
                     <div class="gc-{{ $piece }}"
-                        :class="{'opacity-50 bg-opacity-25': notRelevant.{{ $piece }}}"
+                        :class="{'opacity-50 bg-opacity-25': theCase.inputConditions.{{ $piece }}.notRelevant}"
                     >
                         <div class="diagram-ellipse overflow-hidden"
-                            x-show="(('{{ $piece }}' === 'act' && dinType) || ('{{ $piece }}' !== 'act' && gCase.act))"
-                            :class="{'pt-4' : '{{ $piece }}' === 'act'}"
+                            x-show="theCase.act && theCase.dinType"
                             id="gc-{{ $piece }}"">
-                            <div class="flex flex-col h-full justify-evenly mb-4 {{ ($piece == 'act') ? 'mx-12': 'mx-2' }}"
+                            <div class="flex flex-col h-full justify-evenly mb-4 mx-2"
                                 id="gc-{{ $piece }}-inner">
                                 <div class="flex justify-evenly items-center">
                                     <div x-html="localizedTexts.case{{ ucfirst($piece) }}">
                                     </div>
-@if ($piece !== 'act')
                                     <div x-show="{{ $hideIcons ? 'false' : 'true' }}">
                                         <img src="{{ asset("storage/images/$piece.png")}}"
                                             class="h-8 w-8"
-                                            x-bind:alt="localizedTexts.case{{ ucfirst($piece) }}"
+                                            :alt="localizedTexts.case{{ ucfirst($piece) }}"
                                         >
                                     </div>
-@endif
-
                                 </div>
-                                <div x-show="!gCase.{{ $piece }}" class="flex content-center items-center">
+                                <div x-show="!theCase.inputConditions.{{ $piece }}.value" class="flex content-center items-center">
                                     <div class="w-full">
                                         <input type="text"
-                                            class="{{ $piece == 'act' ? 'w-full' : 'w-11/12'}} border-2 text-center"
+                                            class="w-11/12 border-2 text-center"
                                             x-model="tmpCase.{{ $piece }}"
-                                            @blur="updateCase('{{ $piece }}')">
+                                            @change="updateCase('{{ $piece }}')">
                                     </div>
-                                    <div x-show="'{{ $piece }}' !== 'act'" class="flex items-center">
+                                    <div class="flex items-center">
                                         <input type="checkbox"
-                                            x-model="notRelevant.{{ $piece }}"
-                                            @click="gCase.{{ $piece }} = (!notRelevant.{{ $piece }} ? ' ' : gCase.{{ $piece }})">
-                                        N/R
+                                            class="inline-block align-middle"
+                                            x-model="theCase.inputConditions.{{ $piece }}.notRelevant"
+                                            @click="theCase.inputConditions.{{ $piece }}.value = (!theCase.inputConditions.{{ $piece }}.notRelevant ? ' ' : theCase.inputConditions.{{ $piece }}.value)">
+                                        <label class="inline-block align-middle">N/R</label>
                                     </div>
                                 </div>
                                 <div>
-                                    <span x-text="notRelevant.{{ $piece }} ? localizedTexts.notRelevant : gCase.{{ $piece }}"
-                                        x-show="gCase.{{ $piece }}"
-                                        class="border-b-2 border-dashed"
-                                        @dblclick="resetCasePiece('{{ $piece }}')"
-                                    ></span>
+                                    @include('subviews.clickable-text',
+                                             ['show' => "theCase.inputConditions.$piece.value",
+                                              'dblClick' => "resetCasePiece('$piece')",
+                                              'text' => "getInputConditionText('$piece')"])
                                 </div>
                             </div>
                         </div>
                     </div>
-
 @endforeach
+                    <div class="gc-act">
+                        <div class="diagram-ellipse overflow-hidden flex flex-col justify-evenly h-full"
+                            x-show="theCase.dinType"
+                            id="gc-act"">
+                            <div class="mx-24 h-1 -mt-2" id="gc-act-top"></div>
+                            <div class="mx-12 h-1 mt-2" id="gc-act-inner"></div>
+                            <div x-html="localizedTexts.caseAct"></div>
+                            <div x-show="!theCase.act" class="flex content-center items-center">
+                                <div class="w-3/4 mx-auto">
+                                    <input type="text"
+                                        class="w-11/12 border-2 text-center"
+                                        x-model="tmpCase.act"
+                                        @blur="updateAct()">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                @include('subviews.clickable-text',
+                                        ['show' => "theCase.act",
+                                         'dblClick' => "resetAct()",
+                                         'text' => "theCase.act"])
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div x-show="selectedText">
+                <div x-show="theCase.text">
                     <div class="flex justify-center p-0 my-0">
                         <div class="w-2 bg-blue-500 h-24 -mt-5"></div>
                     </div>
@@ -150,20 +181,39 @@ $pieces = [
                         class="gc-din-type w-1/4 mx-auto border-blue-500 bg-blue-400 h-16 -mt-4 text-xs flex flex-col justify-center items-center">
                         <div x-text="localizedTexts.caseDin"></div>
                         <div>
-                            <select x-show='!dinType' x-model='dinType''>
+                            <select x-show='!theCase.dinType' x-model='theCase.dinType''>
                                 <option value="" x-text="localizedTexts.selectDinType"></option>
                                 <template x-for="aDinType in dinTypes">
                                     <option :key="aDinType" :value="aDinType" x-text="aDinType">
                                 </template>
                             </select>
-                            <span x-show="dinType"
-                                @dblclick="dinType = ''"
-                                class="border-b-2 border-dashed"
-                                x-text="dinType"></span>
+                            @include('subviews.clickable-text',
+                                    ['show' => "theCase.dinType",
+                                     'dblClick' => "theCase.dinType = ''",
+                                     'text' => "theCase.dinType"])
                         </div>
                     </div>
                 </div>
-            {!! Form::close() !!}
+                <div class="flex align-text-top justify-center mt-4"
+                    x-show="theCase.act && theCase.dinType"
+                >
+                    <button :disabled="!caseComplete()"
+                        x-text="localizedTexts.saveCase"
+                        :class="{'cursor-wait': !caseComplete()}"
+                    ></button>
+                    <div class="rounded-full bg-red-600 cursor-pointer text-sm w-5 h-5 text-center ml-4"
+                        @click="showErrors = true"
+                        x-show="!caseComplete()"
+                        type="button">
+                        ?
+                    </div>
+                    @include('subviews.modal',
+                             ['showFlag' => 'showErrors',
+                              'modalContent' => 'validationErrors',
+                              'classes' => '',
+                              'clickAway' => 'showErrors = false'])
+                </div>
+            </form>
         </div>
     </div>
 

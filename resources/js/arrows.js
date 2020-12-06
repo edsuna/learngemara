@@ -2,7 +2,7 @@ import arrowCreate, {DIRECTION, HEAD} from 'arrows-svg';
 
 const pieces = {
     consequences: {
-        fromDirection: DIRECTION.BOTTOM,
+        fromDirection: DIRECTION.RIGHT,
         toDirection: DIRECTION.TOP_LEFT,
         toID: '-inner',
     },
@@ -10,7 +10,7 @@ const pieces = {
     when: {
         fromDirection: DIRECTION.BOTTOM,
         toDirection: DIRECTION.TOP_LEFT,
-        toID: '-inner',
+        toID: '-top',
     },
 
     where: {
@@ -28,7 +28,7 @@ const pieces = {
     withWhat: {
         fromDirection: DIRECTION.BOTTOM,
         toDirection: DIRECTION.TOP_RIGHT,
-        toID: '-inner',
+        toID: '-top',
     },
 
     how: {
@@ -38,13 +38,13 @@ const pieces = {
     },
 
     other: {
-        fromDirection: DIRECTION.RIGHT,
+        fromDirection: DIRECTION.BOTTOM,
         toDirection: DIRECTION.LEFT,
         toID: '',
     },
 
     who: {
-        fromDirection: DIRECTION.LEFT,
+        fromDirection: DIRECTION.BOTTOM,
         toDirection: DIRECTION.RIGHT,
         toID: '',
     },

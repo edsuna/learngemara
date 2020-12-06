@@ -62,9 +62,9 @@
     direction: ltr;
 }
 
-.gemara-case div {
-    @apply mr-2;
-}
+// .gemara-case div {
+//     @apply mr-2;
+// }
 
 .gemara-case label {
     @apply mr-2;
@@ -90,7 +90,7 @@
 }
 
 .gc-act {
-    @apply col-span-4 items-end;
+    @apply row-start-3 col-span-6 items-end;
     width: 50% !important;
 }
 
@@ -104,6 +104,10 @@
 
 .gc-when, .gc-with-what {
     @apply items-center;
+}
+
+.gc-who {
+    @apply col-start-6;
 }
 
 .arrow {

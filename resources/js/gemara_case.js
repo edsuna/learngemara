@@ -5,27 +5,56 @@ window.gemaraCase = () => {
         masechtot: [],
         dapim: [],
 
-        selectedMasechet: '',
-        selectedDaf: '',
-        selectedText: '',
         tmpSelectedText: '',
         numberOfDapim: 0,
         hasLastAmud: false,
         amudText: false,
-        caseTitle: '',
-        dinType: '',
+        showErrors: false,
 
-        gCase: {
-            consequences: '',
-            when: '',
-            where: '',
-            toWhat: '',
-            withWhat: '',
-            how: '',
-            other: '',
+        theCase: {
+            masechet: '',
+            daf: '',
+            text: '',
+            title: '',
+            dinType: '',
+            inputConditions: {
+                consequences: {
+                    value: '',
+                    notRelevant: false,
+                },
+                when: {
+                    value: '',
+                    notRelevant: false,
+                },
+                where: {
+                    value: '',
+                    notRelevant: false,
+                },
+                toWhat: {
+                    value: '',
+                    notRelevant: false,
+                },
+                withWhat: {
+                    value: '',
+                    notRelevant: false,
+                },
+                how: {
+                    value: '',
+                    notRelevant: false,
+                },
+                other: {
+                    value: '',
+                    notRelevant: false,
+                },
+                who: {
+                    value: '',
+                    notRelevant: false,
+                },
+            },
             act: '',
-            who: '',
+            public: false,
         },
+
         tmpCase: {
             consequences: '',
             when: '',
@@ -37,18 +66,6 @@ window.gemaraCase = () => {
             act: '',
             who: '',
         },
-        notRelevant: {
-            consequences: false,
-            when: false,
-            where: false,
-            toWhat: false,
-            withWhat: false,
-            how: false,
-            other: false,
-            act: false,
-            who: false,
-        },
-        when: '',
 
         dinTypes: [
             'מותר',
@@ -79,6 +96,20 @@ window.gemaraCase = () => {
             caseDin: 'Din Type',
             notRelevant: "Not Relevant",
             selectDinType: 'Select Din Type',
+            saveCase: 'Save',
+            caseMasechetError: 'You must select a Masechet',
+            caseDafError: 'You must select the Daf',
+            caseTextError: 'You must enter the text of the case',
+            caseDinTypeError: 'You must select a Din Type',
+            caseActError: 'You must fill in the Halachik Act',
+            caseConsequencesError: 'You must fill in the Consequences or mark it N/R',
+            caseWhenError: 'You must fill in the When or mark it N/R',
+            caseWhereError: 'You must fill in the Where or mark it N/R',
+            caseToWhatError: 'You must fill in the To What or mark it N/R',
+            caseWithWhatError: 'You must fill in the With What or mark it N/R',
+            caseHowError: 'You must fill in the How or mark it N/R',
+            caseOtherError: 'You must fill in the Other or mark it N/R',
+            caseWhoError: 'You must fill in the Who or mark it N/R',
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -101,6 +132,20 @@ window.gemaraCase = () => {
             caseDin: 'דין',
             notRelevant: 'לא רלוונטי',
             selectDinType: 'בחר סוג הדין',
+            saveCase: 'שמור',
+            caseMasechetError: 'עליך לבחור מסכת',
+            caseDafError: 'עליך לבחור את הדף',
+            caseTextError: 'עליך להזין את הטקסט של המקרה',
+            caseDinTypeError: 'עליך לבחור את סוג הדין',
+            caseActError: 'עליך להזין את המעשה ההלכתי',
+            caseConsequencesError: 'עליך להזין את התוצאות או לסמן אותו כN/R',
+            caseWhenError: 'עליך להזין את המתי או לסמן אותו כN/R',
+            caseWhereError: 'עליך להזין את האיפה או לסמן אותו כN/R',
+            caseToWhatError: 'עליך להזין את הלמי או למה או לסמן אותו כN/R',
+            caseWithWhatError: 'עליך להזין את האם מי או אם מה או לסמן אותו כN/R',
+            caseHowError: 'עליך להזין את האיך או לסמן אותו כN/R',
+            caseOtherError: 'עליך להזין את העוד או לסמן אותו כN/R',
+            caseWhoError: 'עליך להזין את המי או לסמן אותו כN/R',
         },
         selectedLanguage:'English',
 
@@ -115,16 +160,22 @@ window.gemaraCase = () => {
         },
 
         get dafAsText() {
-            let d = this.dapim.find(x => x.value == this.selectedDaf);
+            let d = this.dapim.find(x => x.value == this.theCase.daf);
             return (d !== undefined) ? d.text : '';
         },
 
         get masechetName() {
-            let masechet = this.masechtot.find( x => x.englishName === this.selectedMasechet);
+            let masechet = this.masechtot.find( x => x.englishName === this.theCase.masechet);
             if (masechet === undefined) {
                 return '';
             }
             return (this.selectedLanguage === 'Hebrew') ? masechet.text : masechet.englishName;
+        },
+
+        get validationErrors() {
+            let errors = this.getValidationErrors();
+
+            return (errors.length) ? errors.join('<br>') : false;
         },
 
         getMasechtot() {
@@ -144,7 +195,7 @@ window.gemaraCase = () => {
 
         selectMasechet() {
             this.selected = true;
-            let masechet = this.masechtot.find( x => x.englishName === this.selectedMasechet);
+            let masechet = this.masechtot.find( x => x.englishName === this.theCase.masechet);
             this.numberOfDapim = masechet.numberOfDapim;
             this.hasLastAmud = masechet.hasLastAmud;
             this.dapim = [
@@ -168,11 +219,11 @@ window.gemaraCase = () => {
                 }
             }
 
-            this.selectedDaf = '';
+            this.theCase.daf = '';
         },
 
         getAmudText() {
-            let url = "https://www.sefaria.org/api/texts/" + this.selectedMasechet + '.' + this.selectedDaf;
+            let url = "https://www.sefaria.org/api/texts/" + this.theCase.masechet + '.' + this.theCase.daf;
             fetch(url)
             .then(res => res.json())
             .then(data => {
@@ -193,38 +244,107 @@ window.gemaraCase = () => {
         },
 
         resetCase() {
-            this.selectedMasechet = '';
+            this.theCase.masechet = '';
             this.resetDaf();
         },
 
         resetDaf() {
             this.amudText = '';
-            this.selectedDaf = '';
+            this.theCase.daf = '';
             this.resetDafText();
         },
 
         resetDafText() {
-            this.selectedText = '';
+            this.theCase.text = '';
+        },
+
+        updateAct() {
+            if (this.theCase.act && !this.tmpCase.act) {
+                resetArrows();
+            }
+            else if (!this.theCase.act && this.tmpCase.act) {
+                setTimeout(initArrows, 250);
+            }
+            this.theCase.act = this.tmpCase.act;
         },
 
         updateCase(piece) {
-            if (piece === 'act') {
-                if (this.gCase[piece] && !this.mpCase[piece]) {
-                    resetArrows();
-                }
-                else if (!this.gCase[piece] && this.tmpCase[piece]) {
-                    setInterval(initArrows, 250);
-                }
-            }
-            this.gCase[piece] = this.tmpCase[piece];
+            this.theCase.inputConditions[piece]['value'] = this.tmpCase[piece];
+        },
+
+        resetAct() {
+            this.theCase.act = '';
+            resetArrows();
         },
 
         resetCasePiece(piece) {
-            if (piece === 'act') {
-                resetArrows();
+            this.theCase.inputConditions[piece].value = '';
+            this.theCase.inputConditions[piece].notRelevant = false;
+        },
+
+        getInputConditionText(condition) {
+            if (this.theCase.inputConditions[condition].notRelevant) {
+                if (this.tmpCase[condition]) {
+                    return this.tmpCase[condition];
+                }
+                else {
+                    return this.localizedTexts.notRelevant;
+                }
             }
-            this.gCase[piece] = '';
-            this.notRelevant[piece] = false;
+            else {
+                return this.theCase.inputConditions[condition].value;
+            }
+        },
+
+        getValidationErrors() {
+            let errors = [];
+            if (!this.theCase.masechet) {
+                errors.push(this.localizedTexts.caseMasechetError);
+            }
+            if (!this.theCase.daf) {
+                errors.push(this.localizedTexts.caseDafError);
+            }
+            if (!this.theCase.text) {
+                errors.push(this.localizedTexts.caseTextError);
+            }
+            if (!this.theCase.dinType) {
+                errors.push(this.localizedTexts.caseDinTypeError);
+            }
+            if (!this.theCase.act) {
+                errors.push(this.localizedTexts.caseActError);
+            }
+            if (!this.theCase.inputConditions.consequences.value && !this.theCase.inputConditions.consequences.notRelevant) {
+                errors.push(this.localizedTexts.caseConsequencesError);
+            }
+            if (!this.theCase.inputConditions.when.value && !this.theCase.inputConditions.when.notRelevant) {
+                errors.push(this.localizedTexts.caseWhenError);
+            }
+            if (!this.theCase.inputConditions.where.value && !this.theCase.inputConditions.where.notRelevant) {
+                errors.push(this.localizedTexts.caseWhereError);
+            }
+            if (!this.theCase.inputConditions.withWhat.value && !this.theCase.inputConditions.withWhat.notRelevant) {
+                errors.push(this.localizedTexts.caseWithWhatError);
+            }
+            if (!this.theCase.inputConditions.toWhat.value && !this.theCase.inputConditions.toWhat.notRelevant) {
+                errors.push(this.localizedTexts.caseToWhatError);
+            }
+            if (!this.theCase.inputConditions.how.value && !this.theCase.inputConditions.how.notRelevant) {
+                errors.push(this.localizedTexts.caseHowError);
+            }
+            if (!this.theCase.inputConditions.other.value && !this.theCase.inputConditions.other.notRelevant) {
+                errors.push(this.localizedTexts.caseOtherError);
+            }
+            if (!this.theCase.inputConditions.who.value && !this.theCase.inputConditions.who.notRelevant) {
+                errors.push(this.localizedTexts.caseWhoError);
+            }
+
+            return errors;
+        },
+
+        caseComplete() {
+            let e = this.getValidationErrors();
+
+            return !e.length;
         }
     }
 }
