@@ -14,7 +14,7 @@ window.gemaraCase = () => {
         theCase: {
             masechet: '',
             daf: '',
-            text: '',
+            gemaraText: '',
             title: '',
             dinType: '',
             inputConditions: {
@@ -53,6 +53,7 @@ window.gemaraCase = () => {
             },
             act: '',
             public: false,
+            _token: '',
         },
 
         tmpCase: {
@@ -110,6 +111,7 @@ window.gemaraCase = () => {
             caseHowError: 'You must fill in the How or mark it N/R',
             caseOtherError: 'You must fill in the Other or mark it N/R',
             caseWhoError: 'You must fill in the Who or mark it N/R',
+            needLogin: "Please login to be able to save.",
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -146,6 +148,7 @@ window.gemaraCase = () => {
             caseHowError: 'עליך להזין את האיך או לסמן אותו כN/R',
             caseOtherError: 'עליך להזין את העוד או לסמן אותו כN/R',
             caseWhoError: 'עליך להזין את המי או לסמן אותו כN/R',
+            needLogin: "אנא התחבר כדי לשמור.",
         },
         selectedLanguage:'English',
 
@@ -255,7 +258,7 @@ window.gemaraCase = () => {
         },
 
         resetDafText() {
-            this.theCase.text = '';
+            this.theCase.gemaraText = '';
         },
 
         updateAct() {
@@ -304,7 +307,7 @@ window.gemaraCase = () => {
             if (!this.theCase.daf) {
                 errors.push(this.localizedTexts.caseDafError);
             }
-            if (!this.theCase.text) {
+            if (!this.theCase.gemaraText) {
                 errors.push(this.localizedTexts.caseTextError);
             }
             if (!this.theCase.dinType) {
@@ -345,7 +348,28 @@ window.gemaraCase = () => {
             let e = this.getValidationErrors();
 
             return !e.length;
-        }
+        },
+
+        submitCase() {
+            let tokens = document.getElementsByName('_token');
+            this.theCase._token = tokens[0].value;
+
+            fetch('/gemara_cases', {
+				method: 'POST',
+				headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': "application/json",
+                },
+                body: JSON.stringify(this.theCase)
+            })
+            .then(response => response.json())
+			.then(result => {
+				this.message = 'Form sucessfully submitted!'
+			})
+			.catch((error) => {
+				this.message = 'Ooops! Something went wrong!'
+			});
+        },
     }
 }
 

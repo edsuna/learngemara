@@ -16,7 +16,7 @@ class TractatesTest extends TestCase
     public function testGetTractate()
     {
         $this->seed();
-        $response = $this->get('/api/tractates/3');
+        $response = $this->get('/api/tractates/Eiruvin');
 
         $response->assertStatus(200);
     }
