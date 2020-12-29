@@ -74,14 +74,14 @@
                     <div x-show="theCase.gemaraText" class="flex">
                         <input type="text"
                             x-model="theCase.title"
-                            class="pl-1 inline-block align-middle mr-4"
+                            class="pl-1 inline-block align-middle mx-4"
                             :placeholder="localizedTexts.titleLabel">
                         <div>
                             <input type="checkbox"
                                 class="inline-block align-middle"
                                 x-model="theCase.public">
-                            <label class="inline-block align-middle">
-                                Pubic
+                            <label class="inline-block align-middle"
+                                x-text="localizedTexts.public">
                             </label>
                         </div>
                     </div>

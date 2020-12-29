@@ -5,14 +5,17 @@ window.languageToggle = () => {
             LogIn: "Log in",
             Register: "Register",
             buttonText: 'To Hebrew',
+            confirmDelete: 'Are you sure?',
         },
         hebrewTexts: {
             LogOut: "יציאה",
             LogIn: "התחבר",
             Register: "הרשמה",
             buttonText: 'לאנגלית',
+            confirmDelete: 'האם אתה בטוח?',
         },
-        selectedLanguage:'English',
+        selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
+
         get localizedTexts() {
             if (this.selectedLanguage === 'English') {
                 return this.englishTexts;
@@ -25,11 +28,13 @@ window.languageToggle = () => {
 
         toggleLanguage() {
             this.selectedLanguage = (this.selectedLanguage === 'English') ? 'Hebrew' : 'English';
+            Cookies.set('selectedLanguage', this.selectedLanguage);
         },
 
         setTitle(hebrewTitle, englishTitle) {
             this.englishTexts.pageTitle = englishTitle;
             this.hebrewTexts.pageTitle = hebrewTitle;
-        }
+        },
+
     }
 }

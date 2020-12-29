@@ -42,7 +42,7 @@ class GemaraCaseController extends Controller
      */
     public function index()
     {
-        //
+        return view('gemara_case.index');
     }
 
     /**

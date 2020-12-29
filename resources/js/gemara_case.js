@@ -111,7 +111,8 @@ window.gemaraCase = () => {
             caseHowError: 'You must fill in the How or mark it N/R',
             caseOtherError: 'You must fill in the Other or mark it N/R',
             caseWhoError: 'You must fill in the Who or mark it N/R',
-            needLogin: "Please login to be able to save.",
+            needLogin: 'Please login to be able to save.',
+            public: 'Public',
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -148,9 +149,10 @@ window.gemaraCase = () => {
             caseHowError: 'עליך להזין את האיך או לסמן אותו כN/R',
             caseOtherError: 'עליך להזין את העוד או לסמן אותו כN/R',
             caseWhoError: 'עליך להזין את המי או לסמן אותו כN/R',
-            needLogin: "אנא התחבר כדי לשמור.",
+            needLogin: 'אנא התחבר כדי לשמור',
+            public: 'גלוי',
         },
-        selectedLanguage:'English',
+        selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
 
         get localizedTexts() {
             if (this.selectedLanguage === 'English') {
@@ -364,6 +366,7 @@ window.gemaraCase = () => {
             })
             .then(response => response.json())
 			.then(result => {
+                window.location.href = '/gemara_cases/';
 				this.message = 'Form sucessfully submitted!'
 			})
 			.catch((error) => {

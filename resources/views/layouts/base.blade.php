@@ -24,6 +24,7 @@
         <script src="{{ url(mix('js/app.js')) }}" defer></script>
         {{-- <script src="{{ url('js/gemara_case.js') }}"></script> --}}
         <script src="{{ url('js/gematriya.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
 
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
