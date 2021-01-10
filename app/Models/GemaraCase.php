@@ -31,7 +31,32 @@ class GemaraCase extends Model
         'פסול',
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'masechet',
+        'daf',
+        'gemara_text',
+        'title',
+        'din_type',
+        'act',
+        'public',
+        'consequences',
+        'consequences_nr',
+        'when',
+        'when_nr',
+        'where',
+        'where_nr',
+        'toWhat',
+        'toWhat_nr',
+        'withWhat',
+        'withWhat_nr',
+        'how',
+        'how_nr',
+        'other',
+        'other_nr',
+        'who',
+        'who_nr',
+        'user_id',
+    ];
 
     public function user() {
         return $this->belongsTo('App\User');

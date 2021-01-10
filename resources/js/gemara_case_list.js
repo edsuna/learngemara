@@ -1,16 +1,22 @@
-window.languageToggle = () => {
+window.gemaraCaseList = () => {
     return {
         englishTexts: {
-            LogOut: "Log out",
-            LogIn: "Log in",
-            Register: "Register",
-            buttonText: 'To Hebrew',
+            masechet: 'Tractate',
+            daf: 'Daf',
+            title: 'Title',
+            dinType: 'Din Type',
+            act: 'Act',
+            text: 'Text',
+            actions: 'Actions',
         },
         hebrewTexts: {
-            LogOut: "יציאה",
-            LogIn: "התחבר",
-            Register: "הרשמה",
-            buttonText: 'לאנגלית',
+            masechet: 'מסכת',
+            daf: 'דף',
+            title: 'כותרת',
+            dinType: 'סוג הדין',
+            act: 'מעשה',
+            text: 'טקסט',
+            actions: 'פעולות',
         },
         selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
 
@@ -26,13 +32,10 @@ window.languageToggle = () => {
 
         toggleLanguage() {
             this.selectedLanguage = (this.selectedLanguage === 'English') ? 'Hebrew' : 'English';
-            Cookies.set('selectedLanguage', this.selectedLanguage);
         },
 
-        setTitle(hebrewTitle, englishTitle) {
-            this.englishTexts.pageTitle = englishTitle;
-            this.hebrewTexts.pageTitle = hebrewTitle;
+        editGemaraCase(caseId) {
+            window.location.href = '/gemara_cases/' + caseId;
         },
-
     }
 }

@@ -10,6 +10,8 @@ window.gemaraCase = () => {
         hasLastAmud: false,
         amudText: false,
         showErrors: false,
+        allowUpdates: true,
+        isInit: false,
 
         theCase: {
             masechet: '',
@@ -17,6 +19,7 @@ window.gemaraCase = () => {
             gemaraText: '',
             title: '',
             dinType: '',
+            caseId: 0,
             inputConditions: {
                 consequences: {
                     value: '',
@@ -183,7 +186,7 @@ window.gemaraCase = () => {
             return (errors.length) ? errors.join('<br>') : false;
         },
 
-        getMasechtot() {
+        getMasechtot(theCase, allowUpdates) {
             fetch('/api/tractates')
             .then(res => res.json())
             .then(masechtot => {
@@ -195,7 +198,45 @@ window.gemaraCase = () => {
                         hasLastAmud: masechet.has_last_amud,
                     })
                 }
-            })
+
+                // Only init the case data after we get the list of tractates from the server
+                if (theCase !== '') {
+                    this.initCaseData(theCase);
+                }
+            });
+
+            this.allowUpdates = allowUpdates;
+        },
+
+        initCaseData(theCase) {
+            this.isInit = true;
+            this.theCase.caseId = theCase.id;
+            this.theCase.masechet = theCase.masechet;
+            this.theCase.daf = theCase.daf;
+            this.theCase.gemaraText = theCase.gemara_text;
+            this.theCase.title = theCase.title;
+            this.theCase.dinType = theCase.din_type;
+            this.theCase.inputConditions.consequences.value = theCase.consequences;
+            this.theCase.inputConditions.consequences.notRelevant = theCase.consequences_nr;
+            this.theCase.inputConditions.when.value = theCase.when;
+            this.theCase.inputConditions.when.notRelevant = theCase.when_nr;
+            this.theCase.inputConditions.where.value = theCase.where;
+            this.theCase.inputConditions.where.notRelevant = theCase.where_nr;
+            this.theCase.inputConditions.toWhat.value = theCase.toWhat;
+            this.theCase.inputConditions.toWhat.notRelevant = theCase.toWhat_nr;
+            this.theCase.inputConditions.withWhat.value = theCase.withWhat;
+            this.theCase.inputConditions.withWhat.notRelevant = theCase.withWhat_nr;
+            this.theCase.inputConditions.how.value = theCase.how;
+            this.theCase.inputConditions.how.notRelevant = theCase.how_nr;
+            this.theCase.inputConditions.other.value = theCase.other;
+            this.theCase.inputConditions.other.notRelevant = theCase.other_nr;
+            this.theCase.inputConditions.who.value = theCase.who;
+            this.theCase.inputConditions.who.notRelevant = theCase.who_nr;
+            this.theCase.act = theCase.act;
+            this.theCase.public = theCase.public;
+            this.selectMasechet();
+            setTimeout(initArrows, 250);
+            this.isInit = false;
         },
 
         selectMasechet() {
@@ -224,7 +265,9 @@ window.gemaraCase = () => {
                 }
             }
 
-            this.theCase.daf = '';
+            if (!this.isInit) {
+                this.theCase.daf = '';
+            }
         },
 
         getAmudText() {
@@ -245,7 +288,6 @@ window.gemaraCase = () => {
 
         toggleLanguage() {
             this.selectedLanguage = (this.selectedLanguage === 'English') ? 'Hebrew' : 'English';
-            this.resetCase();
         },
 
         resetCase() {
@@ -353,10 +395,20 @@ window.gemaraCase = () => {
         },
 
         submitCase() {
+            if (!this.allowUpdates) {
+                return false;
+            }
+
             let tokens = document.getElementsByName('_token');
             this.theCase._token = tokens[0].value;
+            this.theCase._method = document.getElementById('_method').value;
+            let url = '/gemara_cases';
 
-            fetch('/gemara_cases', {
+            if (this.theCase.caseId) {
+                url += '/' + this.theCase.caseId;
+            }
+
+            fetch(url, {
 				method: 'POST',
 				headers: {
                     'Content-Type': 'application/json',

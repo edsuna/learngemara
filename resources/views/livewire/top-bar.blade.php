@@ -4,7 +4,7 @@
     @togglelanguage.window="toggleLanguage()"
     class="-mx-8"
 >
-    <div class="top-0 w-full min-w-full bg-white py-4 justify-between px-8"
+    <div class="top-0 w-full min-w-full bg-blue-50 py-4 justify-between px-8"
         :class="(selectedLanguage === 'Hebrew') ? 'rtl left-0 ' : 'right-0 mr-4 '"
     >
         <div class="flex max-w-screen-xl mx-auto justify-between">

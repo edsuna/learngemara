@@ -7,32 +7,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\GemaraCaseRequest;
+use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\Auth;
 
 class GemaraCaseController extends Controller
 {
     /**
-     * Return the data for creating or updating a GemaraCase retrieved from the request
-     *
-     * @param array $requestData
-     * @return array
+     * Display the form for creating or updating a gemara case.
+     * @param mixed $request
+     * @param mixed $gemaraCase
+     * @return View|Factory
+     * @throws BindingResolutionException
      */
-    private function getDataFromRequest($requestData) {
-        $data = [
-            'masechet' => $requestData['masechet'],
-            'daf' => $requestData['daf'],
-            'gemara_text' => $requestData['gemara_text'],
-            'title' => $requestData['title'],
-            'din_type' => $requestData['din_type'],
-            'act' => $requestData['act'],
-            'public' => $requestData['public'],
-        ];
+    private function showForm($request, $gemaraCase) {
+        $masechtot = \App\Models\Tractate::all();
 
-        foreach(GemaraCase::inputConditions as $inputCondition) {
-            $data[$inputCondition] = $requestData[$inputCondition];
-            $data[$inputCondition . '_nr'] = $requestData[$inputCondition . '_nr'];
-        }
-
-        return $data;
+        return view('gemara_case.create')
+            ->with('masechtot', $masechtot)
+            ->with('inputConditions', \App\Models\GemaraCase::inputConditions)
+            ->with('hideIcons', $request->query('hideicons'))
+            ->with('allowUpdates', !$gemaraCase || ($gemaraCase->user_id === Auth::id()))
+            ->with('theCase', $gemaraCase);
     }
 
     /**
@@ -52,40 +49,18 @@ class GemaraCaseController extends Controller
      */
     public function create(Request $request)
     {
-        $masechtot = \App\Models\Tractate::all();
-
-        return view('gemara_case.create')
-            ->with('masechtot', $masechtot)
-            ->with('inputConditions', \App\Models\GemaraCase::inputConditions)
-            ->with('hideIcons', $request->query('hideicons'));
+        return $this->showForm($request, NULL);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  App\Http\Requests\GemaraCaseRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(GemaraCaseRequest $request)
     {
-        $validation = [
-            'masechet' => ['required', 'exists:tractates,english_name'],
-            'daf' => ['required'],
-            'gemara_text' => ['required'],
-            'title' => 'nullable',
-            'din_type' => ['required', Rule::in(GemaraCase::dinTypes)],
-            'act' => ['required'],
-            'public' => ['required'],
-        ];
-
-        foreach (GemaraCase::inputConditions as $inputCondition) {
-            $validation[$inputCondition] = ["required_unless:{$inputCondition}_nr,1"];
-            $validation[$inputCondition . '_nr'] = ["required_without:$inputCondition"];
-        }
-
-        $request->validate($validation);
-
-        $gemaraCaseData = $this->getDataFromRequest($request->all());
+        $gemaraCaseData = $request->all();
         $gemaraCaseData['user_id'] = $request->user()->id;
 
         $gemaraCase = GemaraCase::create($gemaraCaseData);
@@ -102,9 +77,9 @@ class GemaraCaseController extends Controller
      * @param  \App\Models\GemaraCase  $gemaraCase
      * @return \Illuminate\Http\Response
      */
-    public function show(GemaraCase $gemaraCase)
+    public function show(Request $request, GemaraCase $gemaraCase)
     {
-        //
+        return $this->showForm($request, $gemaraCase);
     }
 
     /**
@@ -113,21 +88,26 @@ class GemaraCaseController extends Controller
      * @param  \App\Models\GemaraCase  $gemaraCase
      * @return \Illuminate\Http\Response
      */
-    public function edit(GemaraCase $gemaraCase)
+    public function edit(Request $request, GemaraCase $gemaraCase)
     {
-        //
+        return $this->showForm($request, $gemaraCase);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  App\Http\Requests\GemaraCaseRequest $request
      * @param  \App\Models\GemaraCase  $gemaraCase
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, GemaraCase $gemaraCase)
+    public function update(GemaraCaseRequest $request, GemaraCase $gemaraCase)
     {
-        //
+        $gemaraCaseData = $request->all();
+        $case = GemaraCase::find($gemaraCaseData['caseId']);
+        if ($case->fill($gemaraCaseData)->save()) {
+            return response(json_encode($gemaraCase), 200);
+        }
+        return response(json_encode(['errorMsg' => 'Failed to save update to database']), 500);
     }
 
     /**

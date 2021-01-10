@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="min-h-screen py-12 bg-blue-50 bg-opacity-25 sm:px-6 lg:px-8">
+    <div class="min-h-screen py-12 sm:px-6 lg:px-8">
         @livewire('top-bar', ['englishTitle' => 'How to Learn Gemara', 'hebrewTitle' => 'איך לומדים הלמדנים'])
 
         <div :class="{'rtl': selectedLanguage === 'Hebrew'} "

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use App\Models\GemaraCase;
-
+use Illuminate\Support\Facades\Auth;
 
 class GemaraCaseRequest extends FormRequest
 {
@@ -59,5 +59,17 @@ class GemaraCaseRequest extends FormRequest
         }
 
         return $validation;
+    }
+
+    public function authorize()
+    {
+        if (isset($this->caseId)) {
+            $case = GemaraCase::find($this->caseId);
+            if ($case->user_id != Auth::id()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

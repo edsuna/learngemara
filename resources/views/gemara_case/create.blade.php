@@ -7,19 +7,21 @@
 
         <div
             x-data="gemaraCase()"
-            x-init="getMasechtot()"
+            x-init="getMasechtot({{ isset($theCase) ? $theCase->toJson() : "''" }}, {{ $allowUpdates }})"
             :class="{'rtl': selectedLanguage === 'Hebrew'} "
             @togglelanguage.window="toggleLanguage()"
             x-cloak
         >
-            <form @submit.prevent="submitCase" method="POST">
+            <form @submit.prevent="submitCase" method="{{ isset($theCase) ? 'PUT' : 'POST' }}">
                 @csrf
+                <input name="_method" id="_method" type="hidden" value="{{ isset($theCase) ? 'PUT' : 'POST' }}">
+                <input name="case_id" id="case_id" type="hidden" :value="theCase.caseId" x-show='theCase.caseId'>
                 <div class="flex gemara-case max-w-screen-xl mx-auto"
                     :class="{'justify-between' : theCase.gemaraText}"
                 >
                     <div class="flex">
                         <div class="">
-                            <select x-show='!theCase.masechet' x-model='theCase.masechet' @change='selectMasechet()'>
+                            <select x-show='allowUpdates && !theCase.masechet' x-model='theCase.masechet' @change='selectMasechet()'>
                                 <option value="" x-text="localizedTexts.selectMasechet"></option>
                                 <template x-for="masechet in masechtot">
                                     <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
@@ -27,31 +29,33 @@
                             </select>
                             @include('subviews.clickable-text',
                                      ['show' => 'theCase.masechet',
-                                      'dblClick' => 'resetCase()',
+                                      'dblClick' => 'allowUpdates && resetCase()',
                                       'text' => 'masechetName'])
                         </div>
 
                         <div class="" x-show="theCase.masechet">
-                            {{-- <label for='daf' class="" x-text="localizedTexts.masechetLabel"></label> --}}
-                            <select x-show="!theCase.daf" x-model='theCase.daf' @change="amudText = ''">
+                            <select x-show="allowUpdates && !theCase.daf" x-model='theCase.daf' @change="amudText = ''">
                                 <template x-for="daf in dapim">
                                     <option :key="daf.value" :value="daf.value" x-text="daf.text">
                                 </template>
                             </select>
                             @include('subviews.clickable-text',
                                      ['show' => 'theCase.daf',
-                                      'dblClick' => 'resetDaf()',
+                                      'dblClick' => 'allowUpdates && resetDaf()',
                                       'text' => 'dafAsText'])
                         </div>
 
                         <div x-show="theCase.daf && !theCase.gemaraText" class="flex">
                             <textarea rows="2"
+                                x-show="allowUpdates"
                                 cols="20"
                                 @blur="theCase.gemaraText = tmpSelectedText"
                                 class="border-gray-400 border-2 rounded-sm focus:outline-none rtl"
                                 x-model="tmpSelectedText">
                             </textarea>
-                            <button @click="getAmudText()" type="button">
+                            <button @click="getAmudText()" type="button"
+                                x-show="allowUpdates"
+                            >
                                 <img src="{{ asset('storage/images/amud-text.png')}}"
                                     class="h-8 w-8"
                                     :alt="localizedTexts.showAmudText"
@@ -65,23 +69,33 @@
                         </div>
 
                         <div x-show="theCase.gemaraText"
-                            @dblclick="theCase.gemaraText=''"
+                            @dblclick="allowUpdates && theCase.gemaraText=''"
                             class="rtl max-w-md border-b-2 border-dashed"
                             x-text="theCase.gemaraText">
                         </div>
                     </div>
 
                     <div x-show="theCase.gemaraText" class="flex">
-                        <input type="text"
+                        <textarea rows="2"
                             x-model="theCase.title"
-                            class="pl-1 inline-block align-middle mx-4"
-                            :placeholder="localizedTexts.titleLabel">
+                            x-show="allowUpdates"
+                            cols="20"
+                            class="border-gray-400 border-2 rounded-sm focus:outline-none mx-4"
+                            :class="{'rtl': selectedLanguage === 'Hebrew'}">
+                        </textarea>
+
+                        <div
+                            x-show="!allowUpdates"
+                            x-text="theCase.title"
+                            class="border-gray-400 border-b-2 border-dashed rounded-sm px-2 mx-4"
+                        ></div>
                         <div>
                             <input type="checkbox"
                                 class="inline-block align-middle"
+                                x-show="allowUpdates"
                                 x-model="theCase.public">
                             <label class="inline-block align-middle"
-                                x-text="localizedTexts.public">
+                                x-text="(allowUpdates || theCase.public) ? localizedTexts.public : ''">
                             </label>
                         </div>
                     </div>
@@ -114,9 +128,12 @@
                                         <input type="text"
                                             class="w-11/12 border-2 text-center"
                                             x-model="tmpCase.{{ $inputCondition }}"
+                                            :readonly="!allowUpdates"
                                             @change="updateCase('{{ $inputCondition }}')">
                                     </div>
-                                    <div class="flex items-center">
+                                    <div class="flex items-center"
+                                        x-show="allowUpdates"
+                                    >
                                         <input type="checkbox"
                                             class="inline-block align-middle"
                                             x-model="theCase.inputConditions.{{ $inputCondition }}.notRelevant"
@@ -127,7 +144,7 @@
                                 <div>
                                     @include('subviews.clickable-text',
                                              ['show' => "theCase.inputConditions.$inputCondition.value",
-                                              'dblClick' => "resetCasePiece('$inputCondition')",
+                                              'dblClick' => "allowUpdates && resetCasePiece('$inputCondition')",
                                               'text' => "getInputConditionText('$inputCondition')"])
                                 </div>
                             </div>
@@ -189,10 +206,11 @@
                     <button :disabled="!caseComplete()"
                         x-text="localizedTexts.saveCase"
                         :class="{'cursor-wait': !caseComplete()}"
+                        x-show="allowUpdates"
                     ></button>
                     <div class="rounded-full bg-red-600 cursor-pointer text-sm w-5 h-5 text-center ml-4"
                         @click="showErrors = true"
-                        x-show="!caseComplete()"
+                        x-show="!caseComplete() && allowUpdates"
                         type="button">
                         ?
                     </div>
