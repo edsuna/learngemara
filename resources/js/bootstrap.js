@@ -1,7 +1,6 @@
 import 'alpinejs';
 import './language';
 import './gemara_case';
-import './gemara_case_list';
 import { initArrows, resetArrows } from './arrows';
 
 window.changeLanguage = () => {

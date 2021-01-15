@@ -12,6 +12,7 @@ window.gemaraCase = () => {
         showErrors: false,
         allowUpdates: true,
         isInit: false,
+        saveAs: false,
 
         theCase: {
             masechet: '',
@@ -101,6 +102,7 @@ window.gemaraCase = () => {
             notRelevant: "Not Relevant",
             selectDinType: 'Select Din Type',
             saveCase: 'Save',
+            saveCaseAs: 'Save as New',
             caseMasechetError: 'You must select a Masechet',
             caseDafError: 'You must select the Daf',
             caseTextError: 'You must enter the text of the case',
@@ -116,6 +118,8 @@ window.gemaraCase = () => {
             caseWhoError: 'You must fill in the Who or mark it N/R',
             needLogin: 'Please login to be able to save.',
             public: 'Public',
+            text: 'Text',
+            actions: 'Actions',
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -139,6 +143,7 @@ window.gemaraCase = () => {
             notRelevant: 'לא רלוונטי',
             selectDinType: 'בחר סוג הדין',
             saveCase: 'שמור',
+            saveCaseAs: 'שמור כחדש',
             caseMasechetError: 'עליך לבחור מסכת',
             caseDafError: 'עליך לבחור את הדף',
             caseTextError: 'עליך להזין את הטקסט של המקרה',
@@ -154,6 +159,8 @@ window.gemaraCase = () => {
             caseWhoError: 'עליך להזין את המי או לסמן אותו כN/R',
             needLogin: 'אנא התחבר כדי לשמור',
             public: 'גלוי',
+            text: 'טקסט',
+            actions: 'פעולות',
         },
         selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
 
@@ -205,6 +212,7 @@ window.gemaraCase = () => {
                 }
             });
 
+            this.initDapim();
             this.allowUpdates = allowUpdates;
         },
 
@@ -239,11 +247,7 @@ window.gemaraCase = () => {
             this.isInit = false;
         },
 
-        selectMasechet() {
-            this.selected = true;
-            let masechet = this.masechtot.find( x => x.englishName === this.theCase.masechet);
-            this.numberOfDapim = masechet.numberOfDapim;
-            this.hasLastAmud = masechet.hasLastAmud;
+        fillInDapim() {
             this.dapim = [
                 {
                     value: '',
@@ -264,10 +268,24 @@ window.gemaraCase = () => {
                     });
                 }
             }
+        },
+
+        selectMasechet() {
+            let masechet = this.masechtot.find( x => x.englishName === this.theCase.masechet);
+            this.numberOfDapim = masechet.numberOfDapim;
+            this.hasLastAmud = masechet.hasLastAmud;
+
+            this.fillInDapim();
 
             if (!this.isInit) {
                 this.theCase.daf = '';
             }
+        },
+
+        initDapim() {
+            this.numberOfDapim = 176;
+            this.hasLastAmud = 1;
+            this.fillInDapim();
         },
 
         getAmudText() {
@@ -303,6 +321,10 @@ window.gemaraCase = () => {
 
         resetDafText() {
             this.theCase.gemaraText = '';
+        },
+
+        resetDinType() {
+            this.theCase.dinType = '';
         },
 
         updateAct() {
@@ -401,15 +423,23 @@ window.gemaraCase = () => {
 
             let tokens = document.getElementsByName('_token');
             this.theCase._token = tokens[0].value;
-            this.theCase._method = document.getElementById('_method').value;
             let url = '/gemara_cases';
+            let caseId = this.theCase.caseId;
+            let method = 'POST';
 
             if (this.theCase.caseId) {
-                url += '/' + this.theCase.caseId;
+                if (!this.saveAs) {
+                    url += '/' + this.theCase.caseId;
+                    method = 'PUT';
+                }
+                else {
+                    this.theCase.caseId = 0;
+                }
             }
 
+            this.theCase._method = method;
             fetch(url, {
-				method: 'POST',
+				method: method,
 				headers: {
                     'Content-Type': 'application/json',
                     'Accept': "application/json",
@@ -418,12 +448,21 @@ window.gemaraCase = () => {
             })
             .then(response => response.json())
 			.then(result => {
-                window.location.href = '/gemara_cases/';
-				this.message = 'Form sucessfully submitted!'
+                if (typeof result.message === 'undefined'){
+                    window.location.href = '/gemara_cases/';
+                }
+                else {
+                    alert(result.message);
+                }
+                this.theCase.caseId = caseId;
 			})
 			.catch((error) => {
-				this.message = 'Ooops! Something went wrong!'
+                this.theCase.caseId = caseId;
 			});
+        },
+
+        editGemaraCase(caseId, owner) {
+            window.location.href = '/gemara_cases/' + caseId + (owner ? '/edit' : '');
         },
     }
 }

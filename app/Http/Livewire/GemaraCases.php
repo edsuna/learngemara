@@ -5,24 +5,38 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\GemaraCase;
 use Illuminate\Support\Facades\Auth;
-
+use Livewire\WithPagination;
 
 class GemaraCases extends Component
 {
-    public $gemaraCases;
-    public $selectedId = 0;
+    use WithPagination;
+
+    private $gemaraCases;
+    public $selectedId;
+    public $public;
+    public $masechet;
+    public $daf;
 
     private function getCases() {
-        $this->gemaraCases = GemaraCase::join('tractates', 'gemara_cases.masechet', '=', 'tractates.english_name')
-                ->where('user_id', Auth::id())
+        $query = GemaraCase::join('tractates', 'gemara_cases.masechet', '=', 'tractates.english_name')
                 ->orderBy('tractates.id')
                 ->orderByRaw('daf * 1') // First treat the daf as a number
-                ->orderBy('daf')        // Then take into account the amud
-                ->get(['gemara_cases.id as case_id', 'gemara_cases.*', 'tractates.*']);
+                ->orderBy('daf');       // Then take into account the amud
+        if (!$this->public) {
+            $query = $query->where('user_id', Auth::id());
+        }
+        else {
+            $query = $query->where('public', 1);
+        }
 
+        if ($this->masechet) {
+            $query = $query->where('masechet', $this->masechet);
+        }
+        $this->gemaraCases = $query->select('gemara_cases.id as case_id', 'gemara_cases.*', 'tractates.*')->paginate(25);
     }
 
     public function mount() {
+        $this->selectedId = 0;
         $this->getCases();
     }
 
@@ -32,7 +46,9 @@ class GemaraCases extends Component
 
     public function render()
     {
-        return view('livewire.gemara-cases');
+        $this->getCases();
+        return view('livewire.gemara-cases',
+                    ['gemaraCases' => $this->gemaraCases]);
     }
 
     public function confirmRemove($id) {
@@ -50,6 +66,11 @@ class GemaraCases extends Component
         GemaraCase::destroy($id);
 
         // Remove the case from the collection
+        $this->getCases();
+    }
+
+    public function updateMasechet() {
+        $this->resetPage();
         $this->getCases();
     }
 }

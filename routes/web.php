@@ -57,5 +57,5 @@ Route::middleware('auth')->group(function () {
         ->name('logout');
 });
 
-Route::resource('gemara_cases', GemaraCaseController::class, ['only' => ['create']]);
-Route::resource('gemara_cases', GemaraCaseController::class, ['except' => ['create']])->middleware('auth');
+Route::resource('gemara_cases', GemaraCaseController::class, ['only' => ['create', 'index', 'show']]);
+Route::resource('gemara_cases', GemaraCaseController::class, ['except' => ['create', 'index', 'show']])->middleware('auth');

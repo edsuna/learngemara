@@ -1,20 +1,39 @@
 <div>
     <div
-        x-data="gemaraCaseList()"
+        x-data="gemaraCase()"
+        x-init="getMasechtot('', false)"
         @togglelanguage.window="toggleLanguage()"
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
+        <div class="flex justify-between mb-8">
+            <div>
+                <select wire:model="masechet"
+                    @change='selectMasechet()'>
+                    <option value="" x-text="localizedTexts.selectMasechet"></option>
+                    <template x-for="masechet in masechtot">
+                        <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
+                    </template>
+                </select>
+            </div>
+            <div>
+                <select wire:modecl='daf'>
+                    <template x-for="daf in dapim">
+                        <option :key="daf.value" :value="daf.value" x-text="daf.text">
+                    </template>
+                </select>
+            </div>
+        </div>
         <div class="flex justify-between">
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.masechet">
+            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.masechetLabel">
             </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.daf">
+            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.dafLabel">
             </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.title">
+            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.titleLabel">
             </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.dinType">
+            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.caseDin">
             </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.act">
+            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.caseAct">
             </div>
             <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.text">
             </div>
@@ -60,12 +79,21 @@
                     @include('icons.ex')
                 </button>
                 @endif
+                @if (Auth::user() && Auth::user()->id == $case->user_id)
                 <button type="button"
-                    x-on:click="editGemaraCase({{ $case->case_id }})">
+                    x-on:click="editGemaraCase({{ $case->case_id }}, true)">
                     @include('icons.edit')
                 </button>
+                @else
+                <button type="button"
+                    x-on:click="editGemaraCase({{ $case->case_id }}, false)">
+                    @include('icons.view')
+                </button>
+                @endif
             </div>
         </div>
         @endforeach
+
+        {{ $gemaraCases->links() }}
     </div>
 </div>

@@ -63,9 +63,9 @@ class GemaraCaseRequest extends FormRequest
 
     public function authorize()
     {
-        if (isset($this->caseId)) {
+        if (isset($this->caseId) && $this->caseId) {
             $case = GemaraCase::find($this->caseId);
-            if ($case->user_id != Auth::id()) {
+            if (!$case || ($case->user_id != Auth::id())) {
                 return false;
             }
         }

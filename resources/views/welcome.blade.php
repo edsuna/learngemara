@@ -15,6 +15,9 @@
             <div>
                 <a href="{{ route('gemara_cases.create') }}">Analytic skillset tool</a>
             </div>
+            <div>
+                <a href="{{ route('gemara_cases.index', ['public' => 1]) }}">Public Gemara Cases</a>
+            </div>
             @auth
             <div>
                 <a href="{{ route('gemara_cases.index') }}">My Gemara Cases</a>

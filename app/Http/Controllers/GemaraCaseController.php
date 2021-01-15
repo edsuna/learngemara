@@ -37,9 +37,9 @@ class GemaraCaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('gemara_case.index');
+        return view('gemara_case.index')->with('public', $request->input('public', FALSE));
     }
 
     /**

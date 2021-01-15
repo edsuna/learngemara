@@ -4,6 +4,6 @@
 <div class="min-h-screen py-12 sm:px-6 lg:px-8">
     @livewire('top-bar', ['englishTitle' => 'My Gemara Cases', 'hebrewTitle' => 'רשימת המקרים שלי'])
 
-    @livewire('gemara-cases')
+    @livewire('gemara-cases', ['public' => $public])
 </div>
 @endsection

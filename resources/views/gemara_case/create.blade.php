@@ -12,9 +12,9 @@
             @togglelanguage.window="toggleLanguage()"
             x-cloak
         >
-            <form @submit.prevent="submitCase" method="{{ isset($theCase) ? 'PUT' : 'POST' }}">
+            <form @submit.prevent="submitCase" method="POST">
                 @csrf
-                <input name="_method" id="_method" type="hidden" value="{{ isset($theCase) ? 'PUT' : 'POST' }}">
+                <input name="_method" id="_method" type="hidden" value="'POST'">
                 <input name="case_id" id="case_id" type="hidden" :value="theCase.caseId" x-show='theCase.caseId'>
                 <div class="flex gemara-case max-w-screen-xl mx-auto"
                     :class="{'justify-between' : theCase.gemaraText}"
@@ -69,7 +69,7 @@
                         </div>
 
                         <div x-show="theCase.gemaraText"
-                            @dblclick="allowUpdates && theCase.gemaraText=''"
+                            @dblclick="allowUpdates && resetDafText()"
                             class="rtl max-w-md border-b-2 border-dashed"
                             x-text="theCase.gemaraText">
                         </div>
@@ -169,7 +169,7 @@
                             <div class="mb-4">
                                 @include('subviews.clickable-text',
                                         ['show' => "theCase.act",
-                                         'dblClick' => "resetAct()",
+                                         'dblClick' => "allowUpdates && resetAct()",
                                          'text' => "theCase.act"])
                             </div>
                         </div>
@@ -194,7 +194,7 @@
                             </select>
                             @include('subviews.clickable-text',
                                     ['show' => "theCase.dinType",
-                                     'dblClick' => "theCase.dinType = ''",
+                                     'dblClick' => "allowUpdates && resetDinType()",
                                      'text' => "theCase.dinType"])
                         </div>
                     </div>
@@ -205,10 +205,18 @@
                 @auth
                     <button :disabled="!caseComplete()"
                         x-text="localizedTexts.saveCase"
+                        class="mr-4"
                         :class="{'cursor-wait': !caseComplete()}"
                         x-show="allowUpdates"
                     ></button>
-                    <div class="rounded-full bg-red-600 cursor-pointer text-sm w-5 h-5 text-center ml-4"
+                    <button :disabled="!caseComplete()"
+                        x-text="localizedTexts.saveCaseAs"
+                        :class="{'cursor-wait': !caseComplete()}"
+                        x-show="allowUpdates && theCase.caseId"
+                        class="mr-4"
+                        @click="saveAs = true"
+                    ></button>
+                    <div class="rounded-full bg-red-600 cursor-pointer text-sm w-5 h-5 text-center"
                         @click="showErrors = true"
                         x-show="!caseComplete() && allowUpdates"
                         type="button">
