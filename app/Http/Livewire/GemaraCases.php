@@ -15,7 +15,8 @@ class GemaraCases extends Component
     public $selectedId;
     public $public;
     public $masechet;
-    public $daf;
+    public $daf = '';
+    public $searchText = '';
 
     private function getCases() {
         $query = GemaraCase::join('tractates', 'gemara_cases.masechet', '=', 'tractates.english_name')
@@ -23,15 +24,31 @@ class GemaraCases extends Component
                 ->orderByRaw('daf * 1') // First treat the daf as a number
                 ->orderBy('daf');       // Then take into account the amud
         if (!$this->public) {
-            $query = $query->where('user_id', Auth::id());
+            $query->where('user_id', Auth::id());
         }
         else {
-            $query = $query->where('public', 1);
+            $query->where('public', 1);
         }
 
         if ($this->masechet) {
-            $query = $query->where('masechet', $this->masechet);
+            $query->where('masechet', $this->masechet);
         }
+
+        if ($this->daf) {
+            $query->where('daf', $this->daf);
+        }
+
+        if ($this->searchText) {
+            $query->where(function($query) {
+                $fields = array_merge(['title', 'act'], GemaraCase::inputConditions);
+                $query->where('gemara_text', 'like', "%{$this->searchText}%");
+
+                foreach ($fields as $field) {
+                    $query->orWhere($field, 'like', "%{$this->searchText}%");
+                }
+            });
+        }
+
         $this->gemaraCases = $query->select('gemara_cases.id as case_id', 'gemara_cases.*', 'tractates.*')->paginate(25);
     }
 

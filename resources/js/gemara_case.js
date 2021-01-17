@@ -120,6 +120,7 @@ window.gemaraCase = () => {
             public: 'Public',
             text: 'Text',
             actions: 'Actions',
+            searchText: 'Text to search for...',
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -161,6 +162,7 @@ window.gemaraCase = () => {
             public: 'גלוי',
             text: 'טקסט',
             actions: 'פעולות',
+            searchText: 'חפש...',
         },
         selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
 
@@ -203,7 +205,7 @@ window.gemaraCase = () => {
                         text: masechet.name,
                         numberOfDapim: masechet.pages,
                         hasLastAmud: masechet.has_last_amud,
-                    })
+                    });
                 }
 
                 // Only init the case data after we get the list of tractates from the server

@@ -6,9 +6,10 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
-        <div class="flex justify-between mb-8">
-            <div>
+        <div class="flex mb-8">
+            <div class="mx-4">
                 <select wire:model="masechet"
+                    x-model="theCase.masechet"
                     @change='selectMasechet()'>
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
@@ -16,12 +17,18 @@
                     </template>
                 </select>
             </div>
-            <div>
-                <select wire:modecl='daf'>
+            <div class="mx-4">
+                <select wire:model='daf' x-model="theCase.daf">
                     <template x-for="daf in dapim">
                         <option :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
                 </select>
+            </div>
+            <div class="mx-4">
+                <input type="text"
+                    class="p-1 border-gray-500 border-2"
+                    wire:model="searchText"
+                    :placeholder="localizedTexts.searchText">
             </div>
         </div>
         <div class="flex justify-between">
