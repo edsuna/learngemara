@@ -54,7 +54,7 @@ class GemaraCaseRequest extends FormRequest
         ];
 
         foreach (GemaraCase::inputConditions as $inputCondition) {
-            $validation[$inputCondition] = ["required_unless:{$inputCondition}_nr,1"];
+            $validation[$inputCondition] = ["required_unless:{$inputCondition}_nr,true"];
             $validation[$inputCondition . '_nr'] = ["required_without:$inputCondition"];
         }
 
