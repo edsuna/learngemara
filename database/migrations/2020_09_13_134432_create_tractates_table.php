@@ -17,7 +17,7 @@ class CreateTractatesTable extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('english_name')->unique();
+            $table->string('english_name', 200)->unique();
             $table->integer('pages');
             $table->boolean('has_last_amud');
 
