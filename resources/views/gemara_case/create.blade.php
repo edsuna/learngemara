@@ -56,7 +56,7 @@
                             <button @click="getAmudText()" type="button"
                                 x-show="allowUpdates"
                             >
-                                <img src="{{ asset('storage/images/amud-text.png')}}"
+                                <img src="{{ asset('images/amud-text.png')}}"
                                     class="h-8 w-8"
                                     :alt="localizedTexts.showAmudText"
                                     >
@@ -117,7 +117,7 @@
                                     <div x-html="localizedTexts.case{{ ucfirst($inputCondition) }}">
                                     </div>
                                     <div x-show="{{ $hideIcons ? 'false' : 'true' }}">
-                                        <img src="{{ asset("storage/images/$inputCondition.png")}}"
+                                        <img src="{{ asset("images/$inputCondition.png")}}"
                                             class="h-8 w-8"
                                             :alt="localizedTexts.case{{ ucfirst($inputCondition) }}"
                                         >

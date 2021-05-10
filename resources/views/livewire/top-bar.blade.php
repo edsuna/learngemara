@@ -10,7 +10,7 @@
         <div class="flex max-w-screen-xl mx-auto justify-between">
             <div class="">
                 <a href="{{ route('home') }}">
-                    <img src="{{ asset('storage/images/logo.png') }}">
+                    <img src="{{ asset('images/logo.png') }}">
                 </a>
             </div>
             @if (Route::has('login'))
