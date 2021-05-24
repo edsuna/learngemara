@@ -64,7 +64,7 @@ Route::resource('gemara_cases', GemaraCaseController::class, ['except' => ['crea
 
 use Laravel\Socialite\Facades\Socialite;
 
-Route::get('/auth/redirect', function () {
+Route::get('/auth/google', function () {
     return Socialite::driver('google')->redirect();
 });
 
@@ -78,7 +78,7 @@ Route::get('/auth/callback', function () {
 
             Auth::login($finduser);
 
-            return redirect('/home');
+            return redirect('/');
 
         }else{
             $newUser = User::create([
