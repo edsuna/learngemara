@@ -10,6 +10,8 @@ use App\Http\Livewire\Auth\Passwords\Email;
 use App\Http\Livewire\Auth\Passwords\Reset;
 use App\Http\Livewire\Auth\Register;
 use App\Http\Livewire\Auth\Verify;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -59,3 +61,39 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('gemara_cases', GemaraCaseController::class, ['only' => ['create', 'index', 'show']]);
 Route::resource('gemara_cases', GemaraCaseController::class, ['except' => ['create', 'index', 'show']])->middleware('auth');
+
+use Laravel\Socialite\Facades\Socialite;
+
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+
+Route::get('/auth/callback', function () {
+    try {
+        $user = Socialite::driver('google')->user();
+
+        $finduser = User::where('google_id', $user->id)->first();
+
+        if($finduser){
+
+            Auth::login($finduser);
+
+            return redirect('/home');
+
+        }else{
+            $newUser = User::create([
+                'name' => $user->name,
+                'email' => $user->email,
+                'google_id'=> $user->id,
+                'password' => encrypt('123456dummy')
+            ]);
+
+            Auth::login($newUser);
+
+            return redirect('/home');
+        }
+
+    } catch (Exception $e) {
+        dd($e->getMessage());
+    }
+});
