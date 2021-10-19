@@ -1,6 +1,4 @@
 {
-    "/js/app.js": "/js/app.js?id=7b7ec04c03e0b89b3ca3",
-    "/css/app.css": "/css/app.css?id=524b5ed0fc96f9d95240",
-    "/js/app.js.map": "/js/app.js.map?id=3c95f4fee5d1355e596e",
-    "/css/app.css.map": "/css/app.css.map?id=7ecc89d026a221882526"
+    "/js/app.js": "/js/app.js",
+    "/css/app.css": "/css/app.css"
 }

@@ -121,6 +121,10 @@ window.gemaraCase = () => {
             text: 'Text',
             actions: 'Actions',
             searchText: 'Text to search for...',
+            view: 'View',
+            edit: 'Edit',
+            remove: 'Remove',
+            cancel: 'Cancel',
         },
         hebrewTexts: {
             masechetLabel: 'מסכת',
@@ -163,6 +167,10 @@ window.gemaraCase = () => {
             text: 'טקסט',
             actions: 'פעולות',
             searchText: 'חפש...',
+            view: 'לצפייה',
+            edit: 'עריכה',
+            remove: 'מחק',
+            cancel: 'ביטול',
         },
         selectedLanguage: Cookies.get('selectedLanguage') === 'undefined' ? 'English' : Cookies.get('selectedLanguage'),
 
@@ -468,4 +476,3 @@ window.gemaraCase = () => {
         },
     }
 }
-

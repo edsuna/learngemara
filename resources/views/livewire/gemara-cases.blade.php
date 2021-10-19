@@ -61,7 +61,7 @@
             <div class="flex-1">
                 {{ $case->title }}
             </div>
-            <div class="flex-1">
+            <div class="flex-1 ml-4">
                 {{ $case->din_type }}
             </div>
             <div class="flex-1">
@@ -70,29 +70,34 @@
             <div class="flex-1">
                 {{ $case->gemara_text }}
             </div>
-            <div class="w-32">
-                @if ($selectedId != $case->case_id)
-                <button type="button"
-                    wire:click="confirmRemove({{ $case->case_id }})">
-                    @include('icons.trash')
-                </button>
-                @else
-                <button type="button"
-                    wire:click="removeGemaraCase({{ $case->case_id }})">
-                    @include('icons.check')
-                </button>
-                <button type="button"
-                    wire:click="clearSelected()">
-                    @include('icons.ex')
-                </button>
-                @endif
+            <div class="w-32 ml-4">
                 @if (Auth::user() && Auth::user()->id == $case->user_id)
-                <button type="button"
-                    x-on:click="editGemaraCase({{ $case->case_id }}, true)">
-                    @include('icons.edit')
-                </button>
+                    @if ($selectedId != $case->case_id)
+                    <button type="button"
+                        :title="localizedTexts.remove"
+                        wire:click="confirmRemove({{ $case->case_id }})">
+                        @include('icons.trash')
+                    </button>
+                    @else
+                    <button type="button"
+                        :title="localizedTexts.remove"
+                        wire:click="removeGemaraCase({{ $case->case_id }})">
+                        @include('icons.check')
+                    </button>
+                    <button type="button"
+                        :title="localizedTexts.cancel"
+                        wire:click="clearSelected()">
+                        @include('icons.ex')
+                    </button>
+                    @endif
+                    <button type="button"
+                        :title="localizedTexts.edit"
+                        x-on:click="editGemaraCase({{ $case->case_id }}, true)">
+                        @include('icons.edit')
+                    </button>
                 @else
                 <button type="button"
+                    :title="localizedTexts.view"
                     x-on:click="editGemaraCase({{ $case->case_id }}, false)">
                     @include('icons.view')
                 </button>
