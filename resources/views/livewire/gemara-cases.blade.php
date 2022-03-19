@@ -61,7 +61,7 @@
             <div class="flex-1">
                 {{ $case->title }}
             </div>
-            <div class="flex-1 ml-4">
+            <div class="flex-1 mx-4">
                 {{ $case->din_type }}
             </div>
             <div class="flex-1">
@@ -70,7 +70,7 @@
             <div class="flex-1">
                 {{ $case->gemara_text }}
             </div>
-            <div class="w-32 ml-4">
+            <div class="w-32 mx-4">
                 @if (Auth::user() && Auth::user()->id == $case->user_id)
                     @if ($selectedId != $case->case_id)
                     <button type="button"
