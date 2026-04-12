@@ -30212,6 +30212,7 @@ input:invalid, textarea:invalid, select:invalid {
 }
 
 .sticky {
+  position: -webkit-sticky;
   position: sticky;
 }
 
@@ -73889,6 +73890,7 @@ input:invalid, textarea:invalid, select:invalid {
   }
 
   .sm\:sticky {
+    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -117406,6 +117408,7 @@ input:invalid, textarea:invalid, select:invalid {
   }
 
   .md\:sticky {
+    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -160923,6 +160926,7 @@ input:invalid, textarea:invalid, select:invalid {
   }
 
   .lg\:sticky {
+    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -204440,6 +204444,7 @@ input:invalid, textarea:invalid, select:invalid {
   }
 
   .xl\:sticky {
+    position: -webkit-sticky;
     position: sticky;
   }
 
