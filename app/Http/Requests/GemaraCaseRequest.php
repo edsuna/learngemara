@@ -4,18 +4,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Log;
 use App\Models\GemaraCase;
 use Illuminate\Support\Facades\Auth;
 
 class GemaraCaseRequest extends FormRequest
 {
-    /**
-     * Prepare the data for validation.
-     *
-     * @return void
-     */
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $data = [];
 
@@ -36,12 +30,7 @@ class GemaraCaseRequest extends FormRequest
         $this->merge($data);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         $validation = [
             'masechet' => ['required', 'exists:tractates,english_name'],
@@ -61,7 +50,7 @@ class GemaraCaseRequest extends FormRequest
         return $validation;
     }
 
-    public function authorize()
+    public function authorize(): bool
     {
         if (isset($this->caseId) && $this->caseId) {
             $case = GemaraCase::find($this->caseId);

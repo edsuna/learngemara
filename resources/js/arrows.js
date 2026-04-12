@@ -1,4 +1,7 @@
-import arrowCreate, {DIRECTION, HEAD} from 'arrows-svg';
+import arrowsSvg from 'arrows-svg';
+const arrowCreate = arrowsSvg.default || arrowsSvg.arrowCreate || arrowsSvg;
+const DIRECTION = arrowsSvg.DIRECTION;
+const HEAD = arrowsSvg.HEAD;
 
 const pieces = {
     consequences: {
@@ -53,7 +56,7 @@ const pieces = {
 export function initArrows() {
     for (const [key, val] of Object.entries(pieces)) {
         var arrow = arrowCreate({
-            classfromID: "arrow",
+            className: "arrow",
             from: {
                 direction: val.fromDirection,
                 node: () => document.getElementById("gc-" + key),
@@ -66,7 +69,7 @@ export function initArrows() {
             },
             head: {
                 func: HEAD.NORMAL,
-                size: 10, // custom options that will be passed to head function
+                size: 10,
                 distance: 0.99,
             }
         });
@@ -77,3 +80,6 @@ export function initArrows() {
 export function resetArrows() {
     document.querySelectorAll('.arrow').forEach(e => e.remove());
 }
+
+window.initArrows = initArrows;
+window.resetArrows = resetArrows;

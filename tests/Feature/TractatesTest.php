@@ -3,17 +3,15 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class TractatesTest extends TestCase
 {
-    /**
-     * Get a single tractate.
-     *
-     * @return void
-     */
-    public function testGetTractate()
+    use RefreshDatabase;
+
+    #[Test]
+    public function get_tractate(): void
     {
         $this->seed();
         $response = $this->get('/api/tractates/Eiruvin');

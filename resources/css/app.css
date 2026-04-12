@@ -1,0 +1,82 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+input:invalid, textarea:invalid, select:invalid {
+    box-shadow: none;
+}
+
+[x-cloak] {
+    display: none;
+}
+
+.rtl {
+    direction: rtl;
+}
+
+.ltr {
+    direction: ltr;
+}
+
+.gemara-case label {
+    @apply mr-2;
+}
+
+.gc-diagram > div {
+    @apply text-center h-48 w-full flex;
+}
+
+.arrow-head {
+    border-width: 1em;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    border-top-color: #3f83f8;
+    @apply h-0 w-0;
+}
+
+.diagram-ellipse {
+    @apply border-blue-600 border-2 bg-yellow-200 justify-center text-xs w-full;
+    border-radius: 50% / 50%;
+    height: 50% !important;
+}
+
+.gc-act {
+    @apply row-start-3 col-span-6 items-end;
+    width: 50% !important;
+}
+
+.gc-act .diagram-ellipse {
+    @apply bg-purple-300;
+}
+
+.gc-consequences, .gc-how {
+    @apply items-end;
+}
+
+.gc-when, .gc-with-what {
+    @apply items-center;
+}
+
+.gc-who {
+    @apply col-start-6;
+}
+
+.arrow {
+    pointer-events: none;
+    z-index: 2;
+}
+.arrow__path {
+    stroke: blue;
+    fill: transparent;
+    stroke-dasharray: 0;
+    stroke-width: 2;
+}
+
+.diagram-ellipse input[type="text"] {
+    background-color: white;
+    border-color: white;
+}

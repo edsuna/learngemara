@@ -6,13 +6,14 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class LogoutTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function an_authenticated_user_can_log_out()
+    #[Test]
+    public function an_authenticated_user_can_log_out(): void
     {
         $user = User::factory()->create();
         $this->be($user);
@@ -23,8 +24,8 @@ class LogoutTest extends TestCase
         $this->assertFalse(Auth::check());
     }
 
-    /** @test */
-    public function an_unauthenticated_user_can_not_log_out()
+    #[Test]
+    public function an_unauthenticated_user_can_not_log_out(): void
     {
         $this->post(route('logout'))
             ->assertRedirect(route('login'));

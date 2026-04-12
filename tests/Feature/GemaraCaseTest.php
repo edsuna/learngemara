@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-
 use App\Models\User;
 use App\Models\GemaraCase;
-use PHPUnit\Framework\ExpectationFailedException;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 
 class GemaraCaseTest extends TestCase
 {
@@ -59,37 +56,39 @@ class GemaraCaseTest extends TestCase
         'public' => false,
     ];
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
-
         $this->seed();
     }
 
-    public function testSaveNotLoggedIn() {
+    #[Test]
+    public function save_not_logged_in(): void
+    {
         $response = $this->postJson('/gemara_cases');
         $response->assertStatus(401);
     }
 
-    public function testCreateNotLoggedIn() {
+    #[Test]
+    public function create_not_logged_in(): void
+    {
         $response = $this->get('/gemara_cases/create');
         $response->assertStatus(200);
         $response->assertSee('Analytic Skillset Tool');
     }
 
-    public function testInvalidCase() {
+    #[Test]
+    public function invalid_case(): void
+    {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->postJson('/gemara_cases');
         $response->assertStatus(422);
     }
 
-    /**
-     * @group test
-     * @return void
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     */
-    public function testSaveCase() {
+    #[Test]
+    public function save_case(): void
+    {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->postJson('/gemara_cases', $this->caseData);
@@ -97,7 +96,9 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(201);
     }
 
-    public function testMissingData() {
+    #[Test]
+    public function missing_data(): void
+    {
         $user = User::factory()->create();
         $data = $this->caseData;
 
@@ -106,7 +107,9 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testUpdateCaseNotOwner() {
+    #[Test]
+    public function update_case_not_owner(): void
+    {
         $user = User::factory()->create();
         $user2 = User::factory()->create();
         $case = GemaraCase::factory()->create(['user_id' => $user->id]);
@@ -118,7 +121,9 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function testUpdateCase() {
+    #[Test]
+    public function update_case(): void
+    {
         $user = User::factory()->create();
         $case = GemaraCase::factory()->create(['user_id' => $user->id]);
         $data = $this->caseData;
@@ -129,17 +134,21 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testGetMyGemaraCases() {
+    #[Test]
+    public function get_my_gemara_cases(): void
+    {
         $user = User::factory()->create();
         $case = GemaraCase::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->get('/gemara_cases/');
         $response->assertStatus(200)
             ->assertSee('case-row')
-            ->assertSeeLivewire('top-bar');
+            ->assertSeeLivewire('gemara-cases');
     }
 
-    public function testCreateGemaraCaseForm() {
+    #[Test]
+    public function create_gemara_case_form(): void
+    {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get('/gemara_cases/create');
@@ -147,7 +156,9 @@ class GemaraCaseTest extends TestCase
             ->assertSee('localizedTexts.pageTitle');
     }
 
-    public function testShowGemaraCase() {
+    #[Test]
+    public function show_gemara_case(): void
+    {
         $user = User::factory()->create();
         $case = GemaraCase::factory()->create(['user_id' => $user->id]);
 
@@ -155,10 +166,11 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(200)
             ->assertSee('localizedTexts.pageTitle')
             ->assertSee($case->title);
-
     }
 
-    public function testModifyGemaraCase() {
+    #[Test]
+    public function modify_gemara_case(): void
+    {
         $user = User::factory()->create();
         $case = GemaraCase::factory()->create(['user_id' => $user->id]);
 
@@ -166,6 +178,65 @@ class GemaraCaseTest extends TestCase
         $response->assertStatus(200)
             ->assertSee('localizedTexts.pageTitle')
             ->assertSee($case->title);
+    }
 
+    #[Test]
+    public function home_page_loads(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200)
+            ->assertSee('Analytic skillset tool');
+    }
+
+    #[Test]
+    public function home_page_shows_my_cases_link_when_authenticated(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/');
+        $response->assertStatus(200)
+            ->assertSee('My Gemara Cases');
+    }
+
+    #[Test]
+    public function get_public_gemara_cases(): void
+    {
+        $user = User::factory()->create();
+        GemaraCase::factory()->create(['user_id' => $user->id, 'public' => 1]);
+
+        $response = $this->get('/gemara_cases/?public=1');
+        $response->assertStatus(200)
+            ->assertSeeLivewire('gemara-cases');
+    }
+
+    #[Test]
+    public function show_gemara_case_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user2)->get('/gemara_cases/' . $case->id);
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function gemara_case_has_tractate_relationship(): void
+    {
+        $user = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+
+        $this->assertNotNull($case->tractate);
+        $this->assertEquals($case->masechet, $case->tractate->english_name);
+    }
+
+    #[Test]
+    public function gemara_case_has_user_relationship(): void
+    {
+        $user = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+
+        $this->assertNotNull($case->user);
+        $this->assertEquals($user->id, $case->user->id);
     }
 }

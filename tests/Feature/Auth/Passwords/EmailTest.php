@@ -6,29 +6,30 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class EmailTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function can_view_password_request_page()
+    #[Test]
+    public function can_view_password_request_page(): void
     {
         $this->get(route('password.request'))
             ->assertSuccessful()
             ->assertSeeLivewire('auth.passwords.email');
     }
 
-    /** @test */
-    public function a_user_must_enter_an_email_address()
+    #[Test]
+    public function a_user_must_enter_an_email_address(): void
     {
         Livewire::test('auth.passwords.email')
             ->call('sendResetPasswordLink')
             ->assertHasErrors(['email' => 'required']);
     }
 
-    /** @test */
-    public function a_user_must_enter_a_valid_email_address()
+    #[Test]
+    public function a_user_must_enter_a_valid_email_address(): void
     {
         Livewire::test('auth.passwords.email')
             ->set('email', 'email')
@@ -36,8 +37,8 @@ class EmailTest extends TestCase
             ->assertHasErrors(['email' => 'email']);
     }
 
-    /** @test */
-    public function a_user_who_enters_a_valid_email_address_will_get_sent_an_email()
+    #[Test]
+    public function a_user_who_enters_a_valid_email_address_will_get_sent_an_email(): void
     {
         $user = User::factory()->create();
 
@@ -46,7 +47,7 @@ class EmailTest extends TestCase
             ->call('sendResetPasswordLink')
             ->assertNotSet('emailSentMessage', false);
 
-        $this->assertDatabaseHas('password_resets', [
+        $this->assertDatabaseHas('password_reset_tokens', [
             'email' => $user->email,
         ]);
     }

@@ -1,25 +1,11 @@
-import 'alpinejs';
-import './language';
-import './gemara_case';
-import { initArrows, resetArrows } from './arrows';
+import Alpine from 'alpinejs';
+import Cookies from 'js-cookie';
+
+window.Alpine = Alpine;
+window.Cookies = Cookies;
 
 window.changeLanguage = () => {
-    window.dispatchEvent( new CustomEvent('togglelanguage', { detail: 'toggle' }) );
+    window.dispatchEvent(new CustomEvent('togglelanguage', { detail: 'toggle' }));
 }
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
-
-// import Echo from 'laravel-echo'
-
-// window.Pusher = require('pusher-js');
-
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     forceTLS: true
-// });
+// Alpine.start() is called in app.js after all components are registered

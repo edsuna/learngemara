@@ -1,3 +1,6 @@
-const { gemaraCase } = require('./gemara_case');
+import './bootstrap';
+import './language';
+import './gemara_case';
+import './arrows';
 
-require('./bootstrap');
+window.Alpine.start();

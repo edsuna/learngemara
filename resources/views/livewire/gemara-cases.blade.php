@@ -8,7 +8,7 @@
     >
         <div class="flex mb-8">
             <div class="mx-4">
-                <select wire:model="masechet"
+                <select wire:model.live="masechet"
                     x-model="theCase.masechet"
                     @change='selectMasechet()'>
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
@@ -18,7 +18,7 @@
                 </select>
             </div>
             <div class="mx-4">
-                <select wire:model='daf' x-model="theCase.daf">
+                <select wire:model.live='daf' x-model="theCase.daf">
                     <template x-for="daf in dapim">
                         <option :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
@@ -27,7 +27,7 @@
             <div class="mx-4">
                 <input type="text"
                     class="p-1 border-gray-500 border-2"
-                    wire:model="searchText"
+                    wire:model.live="searchText"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>

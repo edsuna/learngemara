@@ -1,4 +1,5 @@
-const { resetArrows, initArrows } = require("./arrows");
+import { resetArrows, initArrows } from './arrows';
+import gematriya from 'gematriya';
 
 window.gemaraCase = () => {
     return {
@@ -216,7 +217,6 @@ window.gemaraCase = () => {
                     });
                 }
 
-                // Only init the case data after we get the list of tractates from the server
                 if (theCase !== '') {
                     this.initCaseData(theCase);
                 }
@@ -265,7 +265,7 @@ window.gemaraCase = () => {
                 }
             ];
             for (let i = 2; i <= this.numberOfDapim; i++) {
-                let daf = this.selectedLanguage === 'Hebrew' ? gematriya().gematriya(i) : i;
+                let daf = this.selectedLanguage === 'Hebrew' ? gematriya(i) : i;
 
                 this.dapim.push({
                     value: i + this.englishTexts.amudAlef,
@@ -449,15 +449,15 @@ window.gemaraCase = () => {
 
             this.theCase._method = method;
             fetch(url, {
-				method: method,
-				headers: {
+                method: method,
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': "application/json",
                 },
                 body: JSON.stringify(this.theCase)
             })
             .then(response => response.json())
-			.then(result => {
+            .then(result => {
                 if (typeof result.message === 'undefined'){
                     window.location.href = '/gemara_cases/';
                 }
@@ -465,10 +465,10 @@ window.gemaraCase = () => {
                     alert(result.message);
                 }
                 this.theCase.caseId = caseId;
-			})
-			.catch((error) => {
+            })
+            .catch((error) => {
                 this.theCase.caseId = caseId;
-			});
+            });
         },
 
         editGemaraCase(caseId, owner) {

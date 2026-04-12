@@ -3,7 +3,7 @@
     <div
         x-html="{{ $modalContent }}"
         class="{{ $classes }} w-1/2 h-1/2 m-auto bg-white p-4 border-black rounded overflow-y-auto"
-        @click.away="{{ $clickAway }}"
+        @click.outside="{{ $clickAway }}"
     >
     </div>
 </div>

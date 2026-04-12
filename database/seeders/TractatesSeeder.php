@@ -7,69 +7,55 @@ use Illuminate\Support\Facades\DB;
 
 class TractatesSeeder extends Seeder
 {
-    private $mesechtot = array(
-                                array('ברכות', 'Berakhot', 64, 0),
-                                array('שבת', 'Shabbat', 175, 1),
-                                array('ערובין', 'Eiruvin', 105, 0),
-                                array('פסחים', 'Pesachim', 121, 1),
-                                array('ראש השנה', 'Rosh_HaShanah', 35, 0),
-                                array('יומא', 'Yoma', 88, 0),
-                                array('סוכה', 'Sukkah', 56, 1),
-                                array('ביצה', 'Beitzah', 40, 1),
-                                array('תענית', 'Taanit', 31, 0),
-                                array('מגילה', 'Megillah', 32, 0),
-                                array('מועד קטן', 'Moed_Katan', 29, 1),
-                                array('חגיגה', 'Chagigah', 27, 0),
-                                array('יבמות', 'Yevamot', 122, 1),
-                                array('כתובות', 'Ketubot', 112, 1),
-                                array('נדרים', 'Nedarim', 91, 1),
-                                array('נזיר', 'Nazir', 66, 1),
-                                array('סוטה', 'Sotah', 49, 1),
-                                array('גיטין', 'Gittin', 90, 2),
-                                array('קידושין', 'Kiddushin', 82, 1),
-                                array('בבא קמא', 'Bava_Kamma', 119, 1),
-                                array('בבא מציעא', 'Bava_Metzia', 119, 0),
-                                array('בבא בתרא', 'Bava_Batra', 176, 1),
-                                array('סנהדרין', 'Sanhedrin', 113, 1),
-                                array('מכות', 'Makkot', 24, 1),
-                                array('שבועות', 'Shevuot', 49, 1),
-                                array('עבודה זרה', 'Avodah_Zarah', 76, 1),
-                                array('הוריות', 'Horayot', 14, 0),
-                                array('זבחים', 'Zevachim', 120, 1),
-                                array('מנחות', 'Menachot', 110, 0),
-                                array('חולין', 'Chulin', 142, 0),
-                                array('בכורות', 'Bekhorot', 61, 0),
-                                array('ערכין', 'Arakhin', 34, 0),
-                                array('תמורה', 'Temurah', 34, 0),
-                                array('כריתות', 'Keritot', 28, 1),
-                                array('מעילה', 'Meilah', 22, 0),
-                                array('תמיד', 'Tamid', 33, 1),
-                                array('נדה', 'Niddah', 73, 0),
-                              );
+    private $mesechtot = [
+        ['ברכות', 'Berakhot', 64, 0],
+        ['שבת', 'Shabbat', 175, 1],
+        ['ערובין', 'Eiruvin', 105, 0],
+        ['פסחים', 'Pesachim', 121, 1],
+        ['ראש השנה', 'Rosh_HaShanah', 35, 0],
+        ['יומא', 'Yoma', 88, 0],
+        ['סוכה', 'Sukkah', 56, 1],
+        ['ביצה', 'Beitzah', 40, 1],
+        ['תענית', 'Taanit', 31, 0],
+        ['מגילה', 'Megillah', 32, 0],
+        ['מועד קטן', 'Moed_Katan', 29, 1],
+        ['חגיגה', 'Chagigah', 27, 0],
+        ['יבמות', 'Yevamot', 122, 1],
+        ['כתובות', 'Ketubot', 112, 1],
+        ['נדרים', 'Nedarim', 91, 1],
+        ['נזיר', 'Nazir', 66, 1],
+        ['סוטה', 'Sotah', 49, 1],
+        ['גיטין', 'Gittin', 90, 2],
+        ['קידושין', 'Kiddushin', 82, 1],
+        ['בבא קמא', 'Bava_Kamma', 119, 1],
+        ['בבא מציעא', 'Bava_Metzia', 119, 0],
+        ['בבא בתרא', 'Bava_Batra', 176, 1],
+        ['סנהדרין', 'Sanhedrin', 113, 1],
+        ['מכות', 'Makkot', 24, 1],
+        ['שבועות', 'Shevuot', 49, 1],
+        ['עבודה זרה', 'Avodah_Zarah', 76, 1],
+        ['הוריות', 'Horayot', 14, 0],
+        ['זבחים', 'Zevachim', 120, 1],
+        ['מנחות', 'Menachot', 110, 0],
+        ['חולין', 'Chulin', 142, 0],
+        ['בכורות', 'Bekhorot', 61, 0],
+        ['ערכין', 'Arakhin', 34, 0],
+        ['תמורה', 'Temurah', 34, 0],
+        ['כריתות', 'Keritot', 28, 1],
+        ['מעילה', 'Meilah', 22, 0],
+        ['תמיד', 'Tamid', 33, 1],
+        ['נדה', 'Niddah', 73, 0],
+    ];
 
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-
-    private function insert_data($name, $english_name, $pages, $has_last_amud) {
-        DB::table('tractates')->insert([
-            'name' => $name,
-            'english_name' => $english_name,
-            'pages' => $pages,
-            'has_last_amud' => $has_last_amud,
-        ]);
-    }
-
-
-    public function run()
+    public function run(): void
     {
         foreach ($this->mesechtot as $masechet) {
-            $this->insert_data($masechet[0],
-                               $masechet[1],
-                               $masechet[2],
-                               $masechet[3]);
+            DB::table('tractates')->insert([
+                'name' => $masechet[0],
+                'english_name' => $masechet[1],
+                'pages' => $masechet[2],
+                'has_last_amud' => $masechet[3],
+            ]);
         }
     }
 }

@@ -110,7 +110,7 @@
                     >
                         <div class="diagram-ellipse overflow-hidden"
                             x-show="theCase.act && theCase.dinType"
-                            id="gc-{{ $inputCondition }}"">
+                            id="gc-{{ $inputCondition }}">
                             <div class="flex flex-col h-full justify-evenly mb-4 mx-2"
                                 id="gc-{{ $inputCondition }}-inner">
                                 <div class="flex justify-evenly items-center">
@@ -154,7 +154,7 @@
                     <div class="gc-act">
                         <div class="diagram-ellipse overflow-hidden flex flex-col justify-evenly h-full"
                             x-show="theCase.dinType"
-                            id="gc-act"">
+                            id="gc-act">
                             <div class="mx-24 h-1 -mt-2" id="gc-act-top"></div>
                             <div class="mx-12 h-1 mt-2" id="gc-act-inner"></div>
                             <div x-html="localizedTexts.caseAct"></div>
@@ -186,7 +186,7 @@
                         class="gc-din-type w-1/4 mx-auto border-blue-500 bg-blue-400 h-16 -mt-4 text-xs flex flex-col justify-center items-center">
                         <div x-text="localizedTexts.caseDin"></div>
                         <div>
-                            <select x-show='!theCase.dinType' x-model='theCase.dinType''>
+                            <select x-show='!theCase.dinType' x-model='theCase.dinType'>
                                 <option value="" x-text="localizedTexts.selectDinType"></option>
                                 <template x-for="aDinType in dinTypes">
                                     <option :key="aDinType" :value="aDinType" x-text="aDinType">
