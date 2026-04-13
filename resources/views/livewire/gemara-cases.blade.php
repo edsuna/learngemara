@@ -10,7 +10,7 @@
             <div class="mx-4">
                 <select
                     x-model="theCase.masechet"
-                    @change="selectMasechet(); $wire.set('masechet', theCase.masechet)">
+                    @change="selectMasechet(); $nextTick(() => { $wire.set('masechet', $el.value) })">
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
                         <option class="text-slate-800" :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
@@ -19,7 +19,7 @@
             </div>
             <div class="mx-4">
                 <select x-model="theCase.daf"
-                    @change="$wire.set('daf', theCase.daf)">
+                    @change="$nextTick(() => { $wire.set('daf', $el.value) })">
                     <template x-for="daf in dapim">
                         <option class="text-slate-800" :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
@@ -28,8 +28,8 @@
             <div>
                 <input type="text"
                     class="p-1 border-gray-500 border-2"
-                    x-model.debounce.300ms="theCase.searchText"
-                    @input.debounce.300ms="$wire.set('searchText', theCase.searchText || '')"
+                    x-model="theCase.searchText"
+                    @input.debounce.300ms="$wire.set('searchText', $el.value)"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
