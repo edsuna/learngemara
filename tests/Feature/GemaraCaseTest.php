@@ -185,7 +185,7 @@ class GemaraCaseTest extends TestCase
     {
         $response = $this->get('/');
         $response->assertStatus(200)
-            ->assertSee('Analytic skillset tool');
+            ->assertSee('Analytic Skillset Tool');
     }
 
     #[Test]

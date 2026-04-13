@@ -5,6 +5,15 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+@theme {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-hebrew: 'Heebo', system-ui, sans-serif;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
 input:invalid, textarea:invalid, select:invalid {
     box-shadow: none;
 }
@@ -15,6 +24,7 @@ input:invalid, textarea:invalid, select:invalid {
 
 .rtl {
     direction: rtl;
+    font-family: 'Heebo', system-ui, sans-serif;
 }
 
 .ltr {
@@ -34,12 +44,12 @@ input:invalid, textarea:invalid, select:invalid {
     border-right-color: transparent;
     border-left-color: transparent;
     border-bottom-color: transparent;
-    border-top-color: #3f83f8;
+    border-top-color: #0d9488;
     @apply h-0 w-0;
 }
 
 .diagram-ellipse {
-    @apply border-blue-600 border-2 bg-yellow-200 justify-center text-xs w-full;
+    @apply border-teal-600 border-2 bg-yellow-200 justify-center text-xs w-full;
     border-radius: 50% / 50%;
     height: 50% !important;
 }
@@ -50,7 +60,7 @@ input:invalid, textarea:invalid, select:invalid {
 }
 
 .gc-act .diagram-ellipse {
-    @apply bg-purple-300;
+    @apply bg-teal-100;
 }
 
 .gc-consequences, .gc-how {
@@ -70,7 +80,7 @@ input:invalid, textarea:invalid, select:invalid {
     z-index: 2;
 }
 .arrow__path {
-    stroke: blue;
+    stroke: #0d9488;
     fill: transparent;
     stroke-dasharray: 0;
     stroke-width: 2;

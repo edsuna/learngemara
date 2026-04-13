@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="min-h-screen py-12 bg-blue-50 bg-opacity-25 sm:px-6 lg:px-8">
+    <div class="min-h-screen py-12 bg-stone-50 sm:px-6 lg:px-8">
         @livewire('top-bar', ['englishTitle' => 'Analytic Skillset Tool', 'hebrewTitle' => 'כלי למיומנות אנליטית'])
 
         <div
@@ -101,7 +101,7 @@
                     </div>
                 </div>
                 <div x-show="theCase.gemaraText"
-                    class="ltr gc-diagram grid grid-cols-6 gap-x-8 gap-y-24 justify-items-center border-4 border-blue-500 p-4 mt-4 max-w-screen-xl mx-auto"
+                    class="ltr gc-diagram grid grid-cols-6 gap-x-8 gap-y-24 justify-items-center border-4 border-stone-300 rounded-xl p-4 mt-4 max-w-screen-xl mx-auto"
                 >
 
 @foreach ($inputConditions as $inputCondition)
@@ -183,7 +183,7 @@
                         <div class="arrow-head"></div>
                     </div>
                     <div
-                        class="gc-din-type w-1/4 mx-auto border-blue-500 bg-blue-400 h-16 -mt-4 text-xs flex flex-col justify-center items-center">
+                        class="gc-din-type w-1/4 mx-auto border-teal-600 bg-teal-500 text-white rounded-lg h-16 -mt-4 text-xs flex flex-col justify-center items-center">
                         <div x-text="localizedTexts.caseDin"></div>
                         <div>
                             <select x-show='!theCase.dinType' x-model='theCase.dinType'>
