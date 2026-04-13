@@ -206,7 +206,10 @@ window.gemaraCase = () => {
         },
 
         getMasechtot(theCase, allowUpdates) {
-            fetch('/api/tractates')
+            this.initDapim();
+            this.allowUpdates = allowUpdates;
+
+            return fetch('/api/tractates')
             .then(res => res.json())
             .then(masechtot => {
                 for (let masechet of masechtot) {
@@ -222,9 +225,6 @@ window.gemaraCase = () => {
                     this.initCaseData(theCase);
                 }
             });
-
-            this.initDapim();
-            this.allowUpdates = allowUpdates;
         },
 
         initCaseData(theCase) {
