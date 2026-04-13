@@ -6,11 +6,11 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
-        <div class="flex mb-8">
+        <div wire:ignore class="flex mb-8">
             <div class="mx-4">
-                <select wire:model.live="masechet"
+                <select
                     x-model="theCase.masechet"
-                    @change='selectMasechet()'>
+                    @change="selectMasechet(); $wire.set('masechet', theCase.masechet)">
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
                         <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
@@ -18,7 +18,8 @@
                 </select>
             </div>
             <div class="mx-4">
-                <select wire:model.live='daf' x-model="theCase.daf">
+                <select x-model="theCase.daf"
+                    @change="$wire.set('daf', theCase.daf)">
                     <template x-for="daf in dapim">
                         <option :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
@@ -27,7 +28,8 @@
             <div class="mx-4">
                 <input type="text"
                     class="p-1 border-gray-500 border-2"
-                    wire:model.live="searchText"
+                    x-model.debounce.300ms="theCase.searchText"
+                    @input.debounce.300ms="$wire.set('searchText', theCase.searchText || '')"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
