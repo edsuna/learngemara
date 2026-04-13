@@ -106,6 +106,9 @@
         </div>
         @endforeach
 
+    </div>
+
+    <div class="max-w-screen-xl mx-auto mt-6 mb-12">
         {{ $gemaraCases->links() }}
     </div>
 </div>
