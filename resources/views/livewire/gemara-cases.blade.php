@@ -1,7 +1,7 @@
 <div>
     <div
         x-data="gemaraCase()"
-        x-init="getMasechtot('', false)"
+        x-init="getMasechtot('', false); $wire.set('masechet', ''); $wire.set('daf', ''); $wire.set('searchText', '')"
         @togglelanguage.window="toggleLanguage()"
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
