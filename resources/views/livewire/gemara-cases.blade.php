@@ -10,7 +10,7 @@
             <div class="mx-4">
                 <select
                     x-model="theCase.masechet"
-                    @change="selectMasechet(); $nextTick(() => { $wire.set('masechet', $el.value) })">
+                    @change="selectMasechet(); theCase.daf = ''; $nextTick(() => { $wire.set('masechet', $el.value); $wire.set('daf', '') })">
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
                         <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
