@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use App\Models\GemaraCase;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +15,14 @@ class GemaraCases extends Component
     private $gemaraCases;
     public $selectedId;
     public $public;
-    public $masechet;
+
+    #[Url]
+    public $masechet = '';
+
+    #[Url]
     public $daf = '';
+
+    #[Url]
     public $searchText = '';
 
     private function getCases()
