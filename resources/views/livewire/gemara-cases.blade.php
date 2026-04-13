@@ -6,21 +6,20 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
-        <div class="flex mb-8 bg-white rounded-md border-2 border-[#c7b299] p-4 gap-4">
-            <div>
-                <select wire:model.live="masechet"
+        <div wire:ignore class="flex mb-8">
+            <div class="mx-4">
+                <select
                     x-model="theCase.masechet"
-                    @change='selectMasechet()'
-                    class="bg-[#fefce8] border border-stone-300 rounded-md focus:ring-indigo-500 px-3 py-2">
+                    @change="selectMasechet(); $wire.set('masechet', theCase.masechet)">
                     <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
                         <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
                     </template>
                 </select>
             </div>
-            <div>
-                <select wire:model.live='daf' x-model="theCase.daf"
-                    class="bg-[#fefce8] border border-stone-300 rounded-md focus:ring-indigo-500 px-3 py-2">
+            <div class="mx-4">
+                <select x-model="theCase.daf"
+                    @change="$wire.set('daf', theCase.daf)">
                     <template x-for="daf in dapim">
                         <option :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
@@ -28,8 +27,9 @@
             </div>
             <div>
                 <input type="text"
-                    class="bg-[#fefce8] border border-stone-300 rounded-md focus:ring-indigo-500 px-3 py-2"
-                    wire:model.live="searchText"
+                    class="p-1 border-gray-500 border-2"
+                    x-model.debounce.300ms="theCase.searchText"
+                    @input.debounce.300ms="$wire.set('searchText', theCase.searchText || '')"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
