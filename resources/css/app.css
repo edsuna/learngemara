@@ -5,6 +5,15 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+@theme {
+    --font-sans: 'Inter';
+    --font-hebrew: 'Heebo';
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
 input:invalid, textarea:invalid, select:invalid {
     box-shadow: none;
 }
@@ -15,6 +24,7 @@ input:invalid, textarea:invalid, select:invalid {
 
 .rtl {
     direction: rtl;
+    font-family: 'Heebo', system-ui, sans-serif;
 }
 
 .ltr {
@@ -34,12 +44,14 @@ input:invalid, textarea:invalid, select:invalid {
     border-right-color: transparent;
     border-left-color: transparent;
     border-bottom-color: transparent;
-    border-top-color: #3f83f8;
+    border-top-color: #1e3a5f;
     @apply h-0 w-0;
 }
 
 .diagram-ellipse {
-    @apply border-blue-600 border-2 bg-yellow-200 justify-center text-xs w-full;
+    border-color: #1e3a5f;
+    background-color: #f0d78c;
+    @apply border-2 justify-center text-xs w-full;
     border-radius: 50% / 50%;
     height: 50% !important;
 }
@@ -50,7 +62,7 @@ input:invalid, textarea:invalid, select:invalid {
 }
 
 .gc-act .diagram-ellipse {
-    @apply bg-purple-300;
+    background-color: #d4a843;
 }
 
 .gc-consequences, .gc-how {
@@ -70,7 +82,7 @@ input:invalid, textarea:invalid, select:invalid {
     z-index: 2;
 }
 .arrow__path {
-    stroke: blue;
+    stroke: #1e3a5f;
     fill: transparent;
     stroke-dasharray: 0;
     stroke-width: 2;

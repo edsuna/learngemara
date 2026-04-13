@@ -6,106 +6,118 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
-        <div class="flex mb-8">
-            <div class="mx-4">
+        <div class="bg-[#1e3a5f] rounded-xl shadow-md p-5 flex flex-wrap gap-4 mb-8">
+            <div>
                 <select wire:model.live="masechet"
                     x-model="theCase.masechet"
-                    @change='selectMasechet()'>
-                    <option value="" x-text="localizedTexts.selectMasechet"></option>
+                    @change='selectMasechet()'
+                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2">
+                    <option value="" x-text="localizedTexts.selectMasechet" class="text-slate-800"></option>
                     <template x-for="masechet in masechtot">
-                        <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
+                        <option class="text-slate-800" :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
                     </template>
                 </select>
             </div>
-            <div class="mx-4">
-                <select wire:model.live='daf' x-model="theCase.daf">
+            <div>
+                <select wire:model.live='daf' x-model="theCase.daf"
+                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2">
                     <template x-for="daf in dapim">
-                        <option :key="daf.value" :value="daf.value" x-text="daf.text">
+                        <option class="text-slate-800" :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
                 </select>
             </div>
-            <div class="mx-4">
+            <div>
                 <input type="text"
-                    class="p-1 border-gray-500 border-2"
+                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2 placeholder-white/50"
                     wire:model.live="searchText"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
-        <div class="flex justify-between">
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.masechetLabel">
+        <div class="overflow-hidden rounded-xl shadow-md">
+            <div class="flex justify-between bg-[#1e3a5f] px-4 py-3">
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.masechetLabel">
+                </div>
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.dafLabel">
+                </div>
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.titleLabel">
+                </div>
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.caseDin">
+                </div>
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.caseAct">
+                </div>
+                <div class="flex-1 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.text">
+                </div>
+                <div class="w-32 text-xs font-bold text-[#d4a843] uppercase tracking-wider" x-text="localizedTexts.actions">
+                </div>
             </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.dafLabel">
-            </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.titleLabel">
-            </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.caseDin">
-            </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.caseAct">
-            </div>
-            <div class="flex-1 font-bold border-b-2" x-text="localizedTexts.text">
-            </div>
-            <div class="font-bold border-b-2 w-32" x-text="localizedTexts.actions">
-            </div>
-        </div>
-        @foreach ($gemaraCases as $case)
-        <div class="flex justify-between case-row">
-            <div class="flex-1" x-show="selectedLanguage !== 'Hebrew'">
-                {{ str_replace('_', ' ', $case->masechet) }}
-            </div>
-            <div class="flex-1" x-show="selectedLanguage === 'Hebrew'">
-                {{ $case->name }}
-            </div>
-            <div class="flex-1">
-                {{ $case->daf }}
-            </div>
-            <div class="flex-1">
-                {{ $case->title }}
-            </div>
-            <div class="flex-1 mx-4">
-                {{ $case->din_type }}
-            </div>
-            <div class="flex-1">
-                {{ $case->act }}
-            </div>
-            <div class="flex-1">
-                {{ $case->gemara_text }}
-            </div>
-            <div class="w-32 mx-4">
-                @if (Auth::user() && Auth::user()->id == $case->user_id)
-                    @if ($selectedId != $case->case_id)
-                    <button type="button"
-                        :title="localizedTexts.remove"
-                        wire:click="confirmRemove({{ $case->case_id }})">
-                        @include('icons.trash')
-                    </button>
+            @foreach ($gemaraCases as $case)
+            <div class="flex justify-between case-row px-4 py-3 odd:bg-slate-50 hover:bg-[#f0d78c]/20 transition-colors duration-150">
+                <div class="flex-1 text-[#1e3a5f] font-semibold" x-show="selectedLanguage !== 'Hebrew'">
+                    {{ str_replace('_', ' ', $case->masechet) }}
+                </div>
+                <div class="flex-1 text-[#1e3a5f] font-semibold" x-show="selectedLanguage === 'Hebrew'">
+                    {{ $case->name }}
+                </div>
+                <div class="flex-1">
+                    {{ $case->daf }}
+                </div>
+                <div class="flex-1 text-[#1e3a5f] font-semibold">
+                    {{ $case->title }}
+                </div>
+                <div class="flex-1 mx-4">
+                    {{ $case->din_type }}
+                </div>
+                <div class="flex-1">
+                    {{ $case->act }}
+                </div>
+                <div class="flex-1">
+                    {{ $case->gemara_text }}
+                </div>
+                <div class="w-32 mx-4">
+                    @if (Auth::user() && Auth::user()->id == $case->user_id)
+                        @if ($selectedId != $case->case_id)
+                        <button type="button"
+                            :title="localizedTexts.remove"
+                            wire:click="confirmRemove({{ $case->case_id }})"
+                            class="hover:text-[#d4a843] hover:bg-[#f0d78c]/30 rounded p-1 transition-colors duration-150">
+                            @include('icons.trash')
+                        </button>
+                        @else
+                        <button type="button"
+                            :title="localizedTexts.remove"
+                            wire:click="removeGemaraCase({{ $case->case_id }})"
+                            class="hover:text-[#d4a843] hover:bg-[#f0d78c]/30 rounded p-1 transition-colors duration-150">
+                            @include('icons.check')
+                        </button>
+                        <button type="button"
+                            :title="localizedTexts.cancel"
+                            wire:click="clearSelected()"
+                            class="hover:text-[#d4a843] hover:bg-[#f0d78c]/30 rounded p-1 transition-colors duration-150">
+                            @include('icons.ex')
+                        </button>
+                        @endif
+                        <button type="button"
+                            :title="localizedTexts.edit"
+                            x-on:click="editGemaraCase({{ $case->case_id }}, true)"
+                            class="hover:text-[#d4a843] hover:bg-[#f0d78c]/30 rounded p-1 transition-colors duration-150">
+                            @include('icons.edit')
+                        </button>
                     @else
                     <button type="button"
-                        :title="localizedTexts.remove"
-                        wire:click="removeGemaraCase({{ $case->case_id }})">
-                        @include('icons.check')
-                    </button>
-                    <button type="button"
-                        :title="localizedTexts.cancel"
-                        wire:click="clearSelected()">
-                        @include('icons.ex')
+                        :title="localizedTexts.view"
+                        x-on:click="editGemaraCase({{ $case->case_id }}, false)"
+                        class="hover:text-[#d4a843] hover:bg-[#f0d78c]/30 rounded p-1 transition-colors duration-150">
+                        @include('icons.view')
                     </button>
                     @endif
-                    <button type="button"
-                        :title="localizedTexts.edit"
-                        x-on:click="editGemaraCase({{ $case->case_id }}, true)">
-                        @include('icons.edit')
-                    </button>
-                @else
-                <button type="button"
-                    :title="localizedTexts.view"
-                    x-on:click="editGemaraCase({{ $case->case_id }}, false)">
-                    @include('icons.view')
-                </button>
-                @endif
+                </div>
             </div>
+            @endforeach
         </div>
-        @endforeach
 
+    </div>
+
+    <div class="max-w-screen-xl mx-auto mt-6 mb-12">
         {{ $gemaraCases->links() }}
     </div>
 </div>
