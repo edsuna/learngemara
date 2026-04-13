@@ -20,7 +20,8 @@
             <div class="mx-4">
                 <select x-model="theCase.daf"
                     @change="$nextTick(() => { $wire.set('daf', $el.value) })">
-                    <template x-for="daf in dapim">
+                    <option value="" x-text="localizedTexts.selectDaf"></option>
+                    <template x-for="daf in dapim.filter(d => d.value !== '')">
                         <option :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
                 </select>
