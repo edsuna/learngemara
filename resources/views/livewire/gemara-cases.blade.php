@@ -1,7 +1,7 @@
 <div>
     <div
         x-data="gemaraCase()"
-        x-init="getMasechtot('', false); $wire.set('masechet', ''); $wire.set('daf', ''); $wire.set('searchText', '')"
+        x-init="getMasechtot('', false).then(() => { theCase.masechet = $wire.masechet || ''; theCase.daf = $wire.daf || ''; theCase.searchText = $wire.searchText || ''; if (theCase.masechet) selectMasechet(); })"
         @togglelanguage.window="toggleLanguage()"
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
