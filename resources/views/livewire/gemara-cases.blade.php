@@ -6,21 +6,20 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'} "
         class="max-w-screen-xl mx-auto"
     >
-        <div class="bg-[#1e3a5f] rounded-xl shadow-md p-5 flex flex-wrap gap-4 mb-8">
-            <div>
-                <select wire:model.live="masechet"
+        <div wire:ignore class="flex mb-8">
+            <div class="mx-4">
+                <select
                     x-model="theCase.masechet"
-                    @change='selectMasechet()'
-                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2">
-                    <option value="" x-text="localizedTexts.selectMasechet" class="text-slate-800"></option>
+                    @change="selectMasechet(); $wire.set('masechet', theCase.masechet)">
+                    <option value="" x-text="localizedTexts.selectMasechet"></option>
                     <template x-for="masechet in masechtot">
                         <option class="text-slate-800" :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
                     </template>
                 </select>
             </div>
-            <div>
-                <select wire:model.live='daf' x-model="theCase.daf"
-                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2">
+            <div class="mx-4">
+                <select x-model="theCase.daf"
+                    @change="$wire.set('daf', theCase.daf)">
                     <template x-for="daf in dapim">
                         <option class="text-slate-800" :key="daf.value" :value="daf.value" x-text="daf.text">
                     </template>
@@ -28,8 +27,9 @@
             </div>
             <div>
                 <input type="text"
-                    class="text-white bg-white/15 border border-white/30 rounded-lg focus:ring-[#d4a843] px-3 py-2 placeholder-white/50"
-                    wire:model.live="searchText"
+                    class="p-1 border-gray-500 border-2"
+                    x-model.debounce.300ms="theCase.searchText"
+                    @input.debounce.300ms="$wire.set('searchText', theCase.searchText || '')"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
