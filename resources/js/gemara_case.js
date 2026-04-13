@@ -18,6 +18,7 @@ window.gemaraCase = () => {
         theCase: {
             masechet: '',
             daf: '',
+            searchText: '',
             gemaraText: '',
             title: '',
             dinType: '',

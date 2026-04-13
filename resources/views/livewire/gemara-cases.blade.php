@@ -6,29 +6,30 @@
         :class="{'rtl': selectedLanguage === 'Hebrew'}"
         class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8"
     >
-        <!-- Filter bar -->
-        <div class="flex flex-wrap items-center gap-4 mb-8 p-4 bg-white rounded-xl border border-stone-200 shadow-sm">
-            <select wire:model.live="masechet"
-                x-model="theCase.masechet"
-                @change='selectMasechet()'
-                class="text-sm bg-stone-50 border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors">
-                <option value="" x-text="localizedTexts.selectMasechet"></option>
-                <template x-for="masechet in masechtot">
-                    <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
-                </template>
-            </select>
-
-            <select wire:model.live='daf' x-model="theCase.daf"
-                class="text-sm bg-stone-50 border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors">
-                <template x-for="daf in dapim">
-                    <option :key="daf.value" :value="daf.value" x-text="daf.text">
-                </template>
-            </select>
-
-            <div class="flex-1 min-w-[200px]">
+        <div wire:ignore class="flex mb-8">
+            <div class="mx-4">
+                <select
+                    x-model="theCase.masechet"
+                    @change="selectMasechet(); $wire.set('masechet', theCase.masechet)">
+                    <option value="" x-text="localizedTexts.selectMasechet"></option>
+                    <template x-for="masechet in masechtot">
+                        <option :key="masechet.englishName" :value="masechet.englishName" x-text="(selectedLanguage === 'English') ? masechet.englishName.replace('_', ' ') : masechet.text">
+                    </template>
+                </select>
+            </div>
+            <div class="mx-4">
+                <select x-model="theCase.daf"
+                    @change="$wire.set('daf', theCase.daf)">
+                    <template x-for="daf in dapim">
+                        <option :key="daf.value" :value="daf.value" x-text="daf.text">
+                    </template>
+                </select>
+            </div>
+            <div class="mx-4">
                 <input type="text"
-                    class="text-sm w-full bg-stone-50 border border-stone-300 rounded-lg px-3 py-2 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                    wire:model.live="searchText"
+                    class="p-1 border-gray-500 border-2"
+                    x-model.debounce.300ms="theCase.searchText"
+                    @input.debounce.300ms="$wire.set('searchText', theCase.searchText || '')"
                     :placeholder="localizedTexts.searchText">
             </div>
         </div>
