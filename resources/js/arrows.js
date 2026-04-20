@@ -81,5 +81,7 @@ export function resetArrows() {
     document.querySelectorAll('.arrow').forEach(e => e.remove());
 }
 
-window.initArrows = initArrows;
-window.resetArrows = resetArrows;
+if (typeof window !== 'undefined') {
+    window.initArrows = initArrows;
+    window.resetArrows = resetArrows;
+}

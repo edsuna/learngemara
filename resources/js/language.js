@@ -1,4 +1,4 @@
-window.languageToggle = () => {
+export function languageToggle() {
     return {
         englishTexts: {
             LogOut: "Log out",
@@ -35,4 +35,8 @@ window.languageToggle = () => {
         },
 
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.languageToggle = languageToggle;
 }

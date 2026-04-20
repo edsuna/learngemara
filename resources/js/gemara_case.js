@@ -1,7 +1,7 @@
 import { resetArrows, initArrows } from './arrows';
 import gematriya from 'gematriya';
 
-window.gemaraCase = () => {
+export function gemaraCase() {
     return {
         masechtot: [],
         dapim: [],
@@ -476,4 +476,8 @@ window.gemaraCase = () => {
             window.location.href = '/gemara_cases/' + caseId + (owner ? '/edit' : '');
         },
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.gemaraCase = gemaraCase;
 }
