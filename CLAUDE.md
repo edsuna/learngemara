@@ -23,15 +23,26 @@ composer setup
 # Database
 php artisan migrate      # Run migrations
 
-# Testing
+# Testing — Backend (PHPUnit)
 composer test                                          # Run all tests (clears config, then artisan test)
 php artisan test                                        # Run all tests
 ./vendor/bin/phpunit tests/Feature/GemaraCaseTest.php  # Run single test file
 ./vendor/bin/phpunit --filter testMethodName           # Run single test method
 
+# Testing — Frontend (Vitest unit + Playwright E2E)
+npm test                 # Run Vitest unit tests once (resources/js/__tests__/)
+npm run test:watch       # Vitest in watch mode
+npm run test:e2e         # Run Playwright E2E tests (tests/e2e/); auto-starts `php artisan serve`
+npm run test:e2e:ui      # Playwright in interactive UI mode
+
 # Dependencies
 composer install && npm install
 ```
+
+### Testing notes
+- **Backend** tests live in `tests/Feature/` and `tests/Unit/` (PHPUnit).
+- **Frontend unit** tests live in `resources/js/__tests__/` (Vitest, config in `vitest.config.js`).
+- **E2E** tests live in `tests/e2e/` (Playwright, config in `playwright.config.js`). The config auto-starts `php artisan serve` on `127.0.0.1:8000` and reuses an existing server if one is running. E2E tests need built assets (`npm run build`), a running MySQL database with seeded tractates (`php artisan db:seed`), and the Playwright browsers installed (`npx playwright install chromium`).
 
 ## Architecture
 
