@@ -25,6 +25,13 @@ set -e
 #   cd dev
 #   cp .env.example .env
 #   nano .env  # fill in DB, APP_URL, Google OAuth, etc.
+#
+# Production environment notes (already configured as of the L8->L13 cutover):
+#   - App lives in /home/howtolearn/www/app/learngemara (docroot: .../public)
+#   - Runs PHP 8.3 (set per-subdomain in the ICDSoft panel) + MySQL 8
+#     (127.0.0.1:3308, db howtolearn_laravel)
+#   - The CLI ioncube line in /home/howtolearn/php.ini is commented out so
+#     composer/artisan run clean; the app does not use ioncube.
 #######################################################################
 
 # ── Config ───────────────────────────────────────────────────────────
@@ -37,7 +44,10 @@ TEST_PATH="/home/howtolearn/www/dev"
 TEST_URL="https://dev.howtolearngemara.org"
 
 # Production environment
-PROD_PATH="/home/howtolearn/www/app"
+# NOTE: the prod docroot is /home/howtolearn/www/app/learngemara/public; the
+# Laravel app (git repo) lives in .../app/learngemara, NOT .../app (which is the
+# subdomain docroot holding only an ICDSoft placeholder).
+PROD_PATH="/home/howtolearn/www/app/learngemara"
 PROD_URL="https://app.howtolearngemara.org"
 
 # ── Parse arguments ──────────────────────────────────────────────────
@@ -149,7 +159,10 @@ ssh "$SSH_TARGET" bash -s "$REMOTE_PATH" "$BRANCH" << 'PULL_EOF'
 
     git fetch origin
     git checkout "$BRANCH"
-    git pull origin "$BRANCH"
+    # Hard-reset to the remote so the deploy is deterministic and never
+    # blocks on local changes to tracked files (e.g. storage/.gitignore).
+    # Gitignored files (.env, vendor, storage, public/build) are preserved.
+    git reset --hard "origin/$BRANCH"
 PULL_EOF
 echo "   Pull complete"
 
