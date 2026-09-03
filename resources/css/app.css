@@ -44,13 +44,14 @@ input:invalid, textarea:invalid, select:invalid {
     height: 50% !important;
 }
 
-.gc-act {
-    @apply row-start-3 col-span-6 items-end;
+.gc-diagram > div.gc-act {
+    @apply row-start-3 col-span-6 h-24 -mt-24;
     width: 50% !important;
 }
 
 .gc-act .diagram-ellipse {
     @apply bg-purple-300;
+    height: 100% !important;
 }
 
 .gc-consequences, .gc-how {
