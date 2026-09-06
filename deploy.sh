@@ -11,7 +11,8 @@ set -e
 #   ./deploy.sh test master setup         # First-time setup on test
 #   ./deploy.sh production                # Deploy master to production
 #   ./deploy.sh production master setup   # First-time setup on production
-#   ./deploy.sh copydb                    # Copy production DB to dev DB
+#   ./deploy.sh copydb                    # Copy production DB to dev DB (on server)
+#   ./deploy.sh copydb local              # Copy production DB to local prod-parity DB
 #
 # Prerequisites:
 #   - SSH key-based access to the server
@@ -50,6 +51,9 @@ TEST_URL="https://dev.howtolearngemara.org"
 PROD_PATH="/home/howtolearn/www/app/learngemara"
 PROD_URL="https://app.howtolearngemara.org"
 
+# Local prod-parity database (see: ./deploy.sh copydb local)
+LOCAL_PROD_DB="learngemara_prod"
+
 # ── Parse arguments ──────────────────────────────────────────────────
 ENV="${1:-test}"
 BRANCH="${2:-master}"
@@ -57,7 +61,99 @@ ACTION="${3:-deploy}"
 
 SSH_TARGET="$SSH_USER@$SSH_HOST"
 
-# ── Handle copydb command ────────────────────────────────────────────
+# ── Handle "copydb local" (production → local prod-parity DB) ────────
+if [ "$ENV" = "copydb" ] && [ "$BRANCH" = "local" ]; then
+    LOCAL_DB="$LOCAL_PROD_DB"
+
+    # Connection details come from this checkout's .env; only the database
+    # name is overridden, so the prod-parity DB sits on the same local server
+    # as the dev DB.
+    get_local_env() {
+        grep "^$1=" .env | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'"
+    }
+    LOCAL_USER=$(get_local_env DB_USERNAME)
+    LOCAL_PASS=$(get_local_env DB_PASSWORD)
+    LOCAL_HOST=$(get_local_env DB_HOST)
+    LOCAL_PORT=$(get_local_env DB_PORT)
+    MYSQL_LOCAL="mysql -h$LOCAL_HOST -P$LOCAL_PORT -u$LOCAL_USER -p$LOCAL_PASS"
+
+    echo "═══════════════════════════════════════════════════"
+    echo "  Copying PRODUCTION database to local '$LOCAL_DB'"
+    echo "═══════════════════════════════════════════════════"
+    read -p "  This will OVERWRITE the local '$LOCAL_DB' database. Continue? [y/N] " confirm
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+        echo "Aborted."
+        exit 0
+    fi
+
+    DUMP_FILE=$(mktemp /tmp/learngemara_prod_XXXXXX.sql)
+    trap 'rm -f "$DUMP_FILE"' EXIT
+
+    echo ""
+    echo ">> Dumping production database..."
+    ssh "$SSH_TARGET" bash -s "$PROD_PATH" > "$DUMP_FILE" << 'PRODDUMP_EOF'
+        PROD_PATH="$1"
+        get_env() { grep "^$2=" "$1/.env" | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'"; }
+        mysqldump -h"$(get_env "$PROD_PATH" DB_HOST)" \
+                  -P"$(get_env "$PROD_PATH" DB_PORT)" \
+                  -u"$(get_env "$PROD_PATH" DB_USERNAME)" \
+                  -p"$(get_env "$PROD_PATH" DB_PASSWORD)" \
+                  --single-transaction --no-tablespaces \
+                  "$(get_env "$PROD_PATH" DB_DATABASE)"
+PRODDUMP_EOF
+    echo "   Dump complete ($(wc -c < "$DUMP_FILE") bytes)"
+
+    echo ""
+    echo ">> Creating local database '$LOCAL_DB' if needed..."
+    if ! $MYSQL_LOCAL -e "CREATE DATABASE IF NOT EXISTS \`$LOCAL_DB\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"; then
+        echo ""
+        echo "   Could not create '$LOCAL_DB' — the app DB user likely lacks CREATE rights."
+        echo "   Create it once as an admin, then re-run:"
+        echo "     sudo mysql -e \"CREATE DATABASE \\\`$LOCAL_DB\\\`; GRANT ALL ON \\\`$LOCAL_DB\\\`.* TO '$LOCAL_USER'@'localhost';\""
+        exit 1
+    fi
+
+    echo ">> Importing into '$LOCAL_DB'..."
+    $MYSQL_LOCAL "$LOCAL_DB" < "$DUMP_FILE"
+    echo "   Import complete"
+
+    # ── Verify: real COUNT(*) per table, not information_schema estimates ──
+    echo ""
+    echo ">> Verifying row counts (production vs local)..."
+    PROD_COUNTS=$(ssh "$SSH_TARGET" bash -s "$PROD_PATH" << 'PRODCOUNT_EOF'
+        PROD_PATH="$1"
+        get_env() { grep "^$2=" "$1/.env" | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'"; }
+        DB=$(get_env "$PROD_PATH" DB_DATABASE)
+        M="mysql -h$(get_env "$PROD_PATH" DB_HOST) -P$(get_env "$PROD_PATH" DB_PORT) -u$(get_env "$PROD_PATH" DB_USERNAME) -p$(get_env "$PROD_PATH" DB_PASSWORD)"
+        for t in $($M -N -B -e "SELECT table_name FROM information_schema.tables WHERE table_schema='$DB' AND table_type='BASE TABLE' ORDER BY table_name" 2>/dev/null); do
+            echo "$t $($M -N -B -e "SELECT COUNT(*) FROM \`$t\`" "$DB" 2>/dev/null)"
+        done
+PRODCOUNT_EOF
+)
+    LOCAL_COUNTS=$(for t in $($MYSQL_LOCAL -N -B -e "SELECT table_name FROM information_schema.tables WHERE table_schema='$LOCAL_DB' AND table_type='BASE TABLE' ORDER BY table_name" 2>/dev/null); do
+        echo "$t $($MYSQL_LOCAL -N -B -e "SELECT COUNT(*) FROM \`$t\`" "$LOCAL_DB" 2>/dev/null)"
+    done)
+
+    if [ "$PROD_COUNTS" = "$LOCAL_COUNTS" ]; then
+        echo "   OK — every table matches:"
+        echo "$PROD_COUNTS" | sed 's/^/     /'
+    else
+        echo "   MISMATCH between production and local (< prod, > local):"
+        diff <(echo "$PROD_COUNTS") <(echo "$LOCAL_COUNTS") | sed 's/^/     /'
+        echo ""
+        echo "   Do not trust this copy. mysqldump has silently under-dumped on"
+        echo "   this host before — see the L8->L13 cutover notes."
+        exit 1
+    fi
+
+    echo ""
+    echo "═══════════════════════════════════════════════════"
+    echo "  Production DB copied to local '$LOCAL_DB'"
+    echo "═══════════════════════════════════════════════════"
+    exit 0
+fi
+
+# ── Handle copydb command (production → dev, both on the server) ─────
 if [ "$ENV" = "copydb" ]; then
     echo "═══════════════════════════════════════════════════"
     echo "  Copying production DB to dev DB on server"
@@ -115,7 +211,22 @@ elif [ "$ENV" = "test" ]; then
     REMOTE_URL="$TEST_URL"
 else
     echo "Usage: $0 [test|production] [branch] [setup]"
-    echo "       $0 copydb"
+    echo "       $0 copydb          # production DB -> dev DB (on the server)"
+    echo "       $0 copydb local    # production DB -> local $LOCAL_PROD_DB"
+    exit 1
+fi
+
+# ── Safety: deploy only from the main checkout ───────────────────────
+# The prod-parity checkout is a linked worktree on the 'production' branch.
+# It exists to reproduce what is live, never to publish from.
+if [ "$(cd "$(git rev-parse --git-common-dir)" && pwd)" != "$(cd "$(git rev-parse --git-dir)" && pwd)" ]; then
+    echo "ERROR: this is a linked git worktree, not the main checkout."
+    echo "       Deploy from the main checkout instead."
+    exit 1
+fi
+if [ "$(git branch --show-current)" = "production" ]; then
+    echo "ERROR: refusing to deploy while on the 'production' branch."
+    echo "       That branch records what is live; it is not a source to deploy from."
     exit 1
 fi
 
@@ -238,7 +349,22 @@ DEPLOY_EOF
 
 fi
 
-# ── Step 5: Restore local branch ────────────────────────────────────
+# ── Step 5: Record what is now live ─────────────────────────────────
+if [ "$ENV" = "production" ]; then
+    echo ""
+    echo ">> Recording deployed commit on the 'production' branch..."
+    DEPLOYED_SHA=$(git rev-parse "$BRANCH")
+    git push --force-with-lease origin "$DEPLOYED_SHA:refs/heads/production"
+    if git branch -f production "$DEPLOYED_SHA" 2>/dev/null; then
+        echo "   production -> $(git rev-parse --short production)"
+    else
+        echo "   origin/production updated. The local branch is checked out in the"
+        echo "   prod-parity worktree; refresh it there with:"
+        echo "     git -C ~/learngemara-prod pull --ff-only"
+    fi
+fi
+
+# ── Step 6: Restore local branch ────────────────────────────────────
 if [ "$ORIGINAL_BRANCH" != "$BRANCH" ]; then
     echo ""
     echo ">> Restoring local branch to $ORIGINAL_BRANCH..."
