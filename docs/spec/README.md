@@ -40,8 +40,11 @@ behavior, not the observed one. Their tests are expected to fail until fixed.
 
 ```gherkin
 @defect
-Scenario: AUTH-09 - A non-owner cannot delete another user's case
+Scenario: DOMAIN-NN - The behavior as it should be
 ```
+
+(Illustrative IDs in this file use the placeholder `DOMAIN-NN` so they cannot be
+mistaken for real scenarios.)
 
 Untagged scenarios describe behavior that is correct and must be preserved.
 
@@ -56,16 +59,18 @@ Scenarios are marked with how they were established:
 
 ## Domains
 
-| File | Covers | Status |
+| File | Covers | Scenarios |
 |---|---|---|
-| [`diagram.md`](diagram.md) | Ovals, act, din bar, arrows, icons, `?hideicons` | written |
-| `case-authoring.md` | Progressive reveal cascade, Sefaria text fetch, din type, act | pending |
-| `input-conditions.md` | Saved value vs draft vs Not Relevant, reset | pending |
-| `saving.md` | Auth gate, create vs update, save-as, validation errors | pending |
-| `viewing.md` | Show, edit, read-only rendering for non-owners | pending |
-| `case-list.md` | Filters, search, ordering, pagination, visibility, delete | pending |
-| `reference-data.md` | `/api/tractates`, masechet and daf dropdowns, gematriya | pending |
-| `language.md` | Toggle, cookie persistence, RTL | pending |
-| `landing.md` | Home page, navigation | pending |
-| `auth.md` | Login, register, logout, verification, password reset, OAuth | pending |
-| `authorization.md` | Ownership rules across every action | pending |
+| [`landing.md`](landing.md) | Home page, navigation, entry points | HOME |
+| [`language.md`](language.md) | Toggle, cookie persistence, RTL | LANG |
+| [`reference-data.md`](reference-data.md) | `/api/tractates`, masechet and daf pickers, gematriya | REF |
+| [`case-authoring.md`](case-authoring.md) | Progressive reveal cascade, Sefaria amud lookup | CASE |
+| [`input-conditions.md`](input-conditions.md) | Value vs draft vs Not Relevant, reset | COND |
+| [`diagram.md`](diagram.md) | Ovals, act, din bar, arrows, icons, `?hideicons` | DIAG |
+| [`saving.md`](saving.md) | Auth gate, create vs update, save-as, validation | SAVE |
+| [`viewing.md`](viewing.md) | Show, edit, read-only rendering | VIEW |
+| [`case-list.md`](case-list.md) | Filters, search, ordering, pagination, delete | LIST |
+| [`authorization.md`](authorization.md) | Ownership rules across every action | AUTHZ |
+| [`auth.md`](auth.md) | Login, register, logout, verification, reset, OAuth | AUTH |
+
+All eleven domains are written.
