@@ -125,4 +125,4 @@ Forms submit via AJAX (Alpine.js → POST/PUT to GemaraCaseController → JSON r
 Email/password auth via Livewire components plus Google OAuth via Socialite (`/auth/google`, `/auth/callback`).
 
 ### Database
-MySQL with three main tables: `users` (with google_id for OAuth), `tractates` (reference data for 63 tractates), `gemara_cases` (cases with dynamic condition fields like consequences, when, where, who, etc.).
+MySQL with three main tables: `users` (with google_id for OAuth), `tractates` (reference data for 37 tractates), `gemara_cases` (cases with dynamic condition fields like consequences, when, where, who, etc.).
