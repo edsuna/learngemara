@@ -126,4 +126,66 @@ class GemaraCasesLivewireTest extends TestCase
             ->call('updateMasechet')
             ->assertSet('selectedId', 0);
     }
+
+    /**
+     * AUTHZ-04 - A guest cannot delete a case.
+     *
+     * The public case list renders for unauthenticated visitors, and Livewire
+     * actions are callable by anyone who can render the component. Hiding the
+     * delete button in Blade is presentation, not authorization.
+     */
+    #[Test]
+    public function a_guest_cannot_delete_a_case(): void
+    {
+        $owner = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $owner->id, 'public' => true]);
+
+        Livewire::test('gemara-cases', ['public' => true])
+            ->call('removeGemaraCase', $case->id)
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('gemara_cases', ['id' => $case->id]);
+    }
+
+    /** AUTHZ-05 - A logged-in user cannot delete someone else's case. */
+    #[Test]
+    public function a_user_cannot_delete_another_users_case(): void
+    {
+        $owner = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $owner->id, 'public' => true]);
+        $other = User::factory()->create();
+
+        Livewire::actingAs($other)
+            ->test('gemara-cases', ['public' => true])
+            ->call('removeGemaraCase', $case->id)
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('gemara_cases', ['id' => $case->id]);
+    }
+
+    /** AUTHZ-06 - The owner can still delete their own case. */
+    #[Test]
+    public function the_owner_can_delete_their_own_case(): void
+    {
+        $owner = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $owner->id]);
+
+        Livewire::actingAs($owner)
+            ->test('gemara-cases', ['public' => false])
+            ->call('removeGemaraCase', $case->id);
+
+        $this->assertDatabaseMissing('gemara_cases', ['id' => $case->id]);
+    }
+
+    /** AUTHZ-07 - Deleting a case that does not exist is forbidden, not a 500. */
+    #[Test]
+    public function deleting_a_missing_case_is_forbidden(): void
+    {
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('gemara-cases', ['public' => false])
+            ->call('removeGemaraCase', 999999)
+            ->assertForbidden();
+    }
 }

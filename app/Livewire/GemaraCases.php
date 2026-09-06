@@ -91,7 +91,17 @@ class GemaraCases extends Component
 
     public function removeGemaraCase($id)
     {
-        GemaraCase::destroy($id);
+        // Livewire actions are callable by anyone who can render the component,
+        // and the public case list renders for guests. Hiding the delete button
+        // in the Blade template is presentation, not authorization -- without
+        // this check any visitor could delete any case by id.
+        $gemaraCase = GemaraCase::find($id);
+
+        if (!$gemaraCase || $gemaraCase->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $gemaraCase->delete();
         $this->getCases();
     }
 
