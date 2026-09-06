@@ -239,4 +239,67 @@ class GemaraCaseTest extends TestCase
         $this->assertNotNull($case->user);
         $this->assertEquals($user->id, $case->user->id);
     }
+
+    /**
+     * COND-10 - Regression: a case with a Not Relevant condition must be
+     * re-savable without touching it.
+     *
+     * Marking a condition Not Relevant stores it as NULL, and the `_nr` flag
+     * comes back from MySQL as integer 1. `required_unless:{c}_nr,true` only
+     * exempts a real boolean, so the reloaded 1 did not exempt it, the NULL
+     * value failed `required`, and saving an untouched case returned 422.
+     * Re-ticking the checkbox sent a real boolean and appeared to "fix" it.
+     */
+    #[Test]
+    public function a_case_with_not_relevant_conditions_can_be_resaved_unchanged(): void
+    {
+        $user = User::factory()->create();
+
+        $created = $this->actingAs($user)
+            ->postJson('/gemara_cases', $this->caseData)
+            ->assertStatus(201);
+
+        $case = GemaraCase::findOrFail($created->json('id'));
+
+        // 'other' was sent as Not Relevant; confirm how it actually landed.
+        $this->assertNull($case->other, 'A Not Relevant condition stores NULL');
+        $this->assertTrue($case->other_nr, 'The _nr flag must cast to a real boolean');
+
+        // Rebuild the payload the way the edit form hydrates it: straight from
+        // the model's JSON, with nothing edited.
+        $payload = $this->caseData;
+        $payload['caseId'] = $case->id;
+        foreach (GemaraCase::inputConditions as $inputCondition) {
+            $payload['inputConditions'][$inputCondition] = [
+                'value' => $case->{$inputCondition},
+                'notRelevant' => $case->{$inputCondition . '_nr'},
+            ];
+        }
+
+        $this->actingAs($user)
+            ->putJson('/gemara_cases/' . $case->id, $payload)
+            ->assertStatus(200);
+    }
+
+    /**
+     * COND-11 - The _nr flags are booleans in the JSON the edit form consumes.
+     * If they serialise as 1/0 the round-trip above breaks again.
+     */
+    #[Test]
+    public function not_relevant_flags_serialise_as_booleans(): void
+    {
+        $user = User::factory()->create();
+        $id = $this->actingAs($user)
+            ->postJson('/gemara_cases', $this->caseData)
+            ->json('id');
+
+        $json = GemaraCase::findOrFail($id)->toArray();
+
+        foreach (GemaraCase::inputConditions as $inputCondition) {
+            $this->assertIsBool(
+                $json[$inputCondition . '_nr'],
+                "{$inputCondition}_nr must serialise as a boolean, not an integer"
+            );
+        }
+    }
 }

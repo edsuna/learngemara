@@ -56,6 +56,24 @@ class GemaraCase extends Model
         'user_id',
     ];
 
+    /**
+     * The `_nr` (not relevant) columns are booleans. Without this cast they come
+     * back from MySQL as integer 1/0, which serialises into the edit form as 1/0
+     * and then fails `required_unless:{condition}_nr,true` on save -- that rule
+     * only exempts a real boolean. A Not Relevant condition is stored NULL, so
+     * the condition then fails `required` and the case cannot be re-saved.
+     */
+    protected function casts(): array
+    {
+        $casts = ['public' => 'boolean'];
+
+        foreach (self::inputConditions as $inputCondition) {
+            $casts[$inputCondition . '_nr'] = 'boolean';
+        }
+
+        return $casts;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

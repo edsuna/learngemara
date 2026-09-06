@@ -44,7 +44,10 @@ class GemaraCaseRequest extends FormRequest
 
         foreach (GemaraCase::inputConditions as $inputCondition) {
             $validation[$inputCondition] = ["required_unless:{$inputCondition}_nr,true"];
-            $validation[$inputCondition . '_nr'] = ["required_without:$inputCondition"];
+            // 'boolean' is load-bearing, not decorative: it makes Laravel coerce the
+            // required_unless comparison values to booleans, so an _nr arriving as
+            // integer 1 (as it does from the edit form) still exempts the condition.
+            $validation[$inputCondition . '_nr'] = ['boolean', "required_without:$inputCondition"];
         }
 
         return $validation;
