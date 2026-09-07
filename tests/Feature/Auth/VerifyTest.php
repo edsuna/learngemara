@@ -16,6 +16,7 @@ class VerifyTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** AUTH-19 */
     #[Test]
     public function can_view_verification_page(): void
     {
@@ -30,6 +31,7 @@ class VerifyTest extends TestCase
             ->assertSeeLivewire('auth.verify');
     }
 
+    /** AUTH-20 */
     #[Test]
     public function can_resend_verification_email(): void
     {
@@ -42,6 +44,7 @@ class VerifyTest extends TestCase
             ->assertDispatched('resent');
     }
 
+    /** AUTH-21 */
     #[Test]
     public function can_verify(): void
     {
@@ -62,6 +65,7 @@ class VerifyTest extends TestCase
         $this->assertTrue($user->hasVerifiedEmail());
     }
 
+    /** AUTH-22 */
     #[Test]
     public function verify_with_wrong_id_throws_authorization_exception(): void
     {
@@ -79,6 +83,7 @@ class VerifyTest extends TestCase
         $this->get($url)->assertForbidden();
     }
 
+    /** AUTH-23 */
     #[Test]
     public function verify_with_wrong_hash_throws_authorization_exception(): void
     {
@@ -96,6 +101,7 @@ class VerifyTest extends TestCase
         $this->get($url)->assertForbidden();
     }
 
+    /** AUTH-24 */
     #[Test]
     public function verify_already_verified_user_redirects_home(): void
     {

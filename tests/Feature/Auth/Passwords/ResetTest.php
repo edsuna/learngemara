@@ -17,6 +17,7 @@ class ResetTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** AUTH-28 */
     #[Test]
     public function can_view_password_reset_page(): void
     {
@@ -37,6 +38,7 @@ class ResetTest extends TestCase
             ->assertSeeLivewire('auth.passwords.reset');
     }
 
+    /** AUTH-28 */
     #[Test]
     public function can_reset_password(): void
     {
@@ -63,6 +65,7 @@ class ResetTest extends TestCase
         ]));
     }
 
+    /** AUTH-29 */
     #[Test]
     public function token_is_required(): void
     {
@@ -73,6 +76,7 @@ class ResetTest extends TestCase
             ->assertHasErrors(['token' => 'required']);
     }
 
+    /** AUTH-29 */
     #[Test]
     public function email_is_required(): void
     {
@@ -84,6 +88,7 @@ class ResetTest extends TestCase
             ->assertHasErrors(['email' => 'required']);
     }
 
+    /** AUTH-29 */
     #[Test]
     public function email_is_valid_email(): void
     {
@@ -95,6 +100,7 @@ class ResetTest extends TestCase
             ->assertHasErrors(['email' => 'email']);
     }
 
+    /** AUTH-29 */
     #[Test]
     public function password_is_required(): void
     {
@@ -106,6 +112,7 @@ class ResetTest extends TestCase
             ->assertHasErrors(['password' => 'required']);
     }
 
+    /** AUTH-30 */
     #[Test]
     public function password_is_minimum_of_eight_characters(): void
     {
@@ -117,6 +124,7 @@ class ResetTest extends TestCase
             ->assertHasErrors(['password' => 'min']);
     }
 
+    /** AUTH-31 */
     #[Test]
     public function password_matches_password_confirmation(): void
     {

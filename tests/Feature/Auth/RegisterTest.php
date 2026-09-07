@@ -15,6 +15,7 @@ class RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** AUTH-09 */
     #[Test]
     public function registration_page_contains_livewire_component(): void
     {
@@ -23,6 +24,7 @@ class RegisterTest extends TestCase
             ->assertSeeLivewire('auth.register');
     }
 
+    /** AUTH-09 */
     #[Test]
     public function is_redirected_if_already_logged_in(): void
     {
@@ -33,6 +35,7 @@ class RegisterTest extends TestCase
             ->assertRedirect(route('home'));
     }
 
+    /** AUTH-10 */
     #[Test]
     public function a_user_can_register(): void
     {
@@ -52,6 +55,7 @@ class RegisterTest extends TestCase
         Event::assertDispatched(Registered::class);
     }
 
+    /** AUTH-11 */
     #[Test]
     public function name_is_required(): void
     {
@@ -61,6 +65,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['name' => 'required']);
     }
 
+    /** AUTH-11 */
     #[Test]
     public function email_is_required(): void
     {
@@ -70,6 +75,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['email' => 'required']);
     }
 
+    /** AUTH-12 */
     #[Test]
     public function email_is_valid_email(): void
     {
@@ -79,6 +85,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['email' => 'email']);
     }
 
+    /** AUTH-13 */
     #[Test]
     public function email_hasnt_been_taken_already(): void
     {
@@ -90,6 +97,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['email' => 'unique']);
     }
 
+    /** AUTH-14 */
     #[Test]
     public function see_email_hasnt_already_been_taken_validation_message_as_user_types(): void
     {
@@ -103,6 +111,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['email' => 'unique']);
     }
 
+    /** AUTH-11 */
     #[Test]
     public function password_is_required(): void
     {
@@ -113,6 +122,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['password' => 'required']);
     }
 
+    /** AUTH-15 */
     #[Test]
     public function password_is_minimum_of_eight_characters(): void
     {
@@ -123,6 +133,7 @@ class RegisterTest extends TestCase
             ->assertHasErrors(['password' => 'min']);
     }
 
+    /** AUTH-16 */
     #[Test]
     public function password_matches_password_confirmation(): void
     {

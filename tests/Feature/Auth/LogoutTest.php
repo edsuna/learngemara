@@ -12,6 +12,7 @@ class LogoutTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** AUTH-17 */
     #[Test]
     public function an_authenticated_user_can_log_out(): void
     {
@@ -24,6 +25,7 @@ class LogoutTest extends TestCase
         $this->assertFalse(Auth::check());
     }
 
+    /** AUTH-18 */
     #[Test]
     public function an_unauthenticated_user_can_not_log_out(): void
     {

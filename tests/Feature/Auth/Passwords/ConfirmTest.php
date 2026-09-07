@@ -23,6 +23,7 @@ class ConfirmTest extends TestCase
         })->middleware(['web', 'password.confirm']);
     }
 
+    /** AUTH-32 */
     #[Test]
     public function a_user_must_confirm_their_password_before_visiting_a_protected_page(): void
     {
@@ -37,6 +38,7 @@ class ConfirmTest extends TestCase
             ->assertSeeLivewire('auth.passwords.confirm');
     }
 
+    /** AUTH-33 */
     #[Test]
     public function a_user_must_enter_a_password_to_confirm_it(): void
     {
@@ -45,6 +47,7 @@ class ConfirmTest extends TestCase
             ->assertHasErrors(['password' => 'required']);
     }
 
+    /** AUTH-33 */
     #[Test]
     public function a_user_must_enter_their_own_password_to_confirm_it(): void
     {
@@ -60,6 +63,7 @@ class ConfirmTest extends TestCase
             ->assertHasErrors(['password']);
     }
 
+    /** AUTH-32 */
     #[Test]
     public function a_user_who_confirms_their_password_will_get_redirected(): void
     {
