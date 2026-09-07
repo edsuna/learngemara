@@ -177,6 +177,7 @@ describe('gemaraCase', () => {
     });
 
     describe('fillInDapim', () => {
+        // REF-06
         it('generates correct number of dapim with last amud', () => {
             component.numberOfDapim = 4;
             component.hasLastAmud = 1;
@@ -184,6 +185,8 @@ describe('gemaraCase', () => {
             // placeholder + (2a,2b) + (3a,3b) + (4a,4b) = 7
             expect(component.dapim).toHaveLength(7);
         });
+
+        // REF-06
 
         it('omits last amud bet when hasLastAmud is 0', () => {
             component.numberOfDapim = 4;
@@ -193,6 +196,19 @@ describe('gemaraCase', () => {
             expect(component.dapim).toHaveLength(6);
         });
 
+        // REF-05
+        it('starts the dapim at 2a, because there is no daf 1', () => {
+            component.numberOfDapim = 10;
+            component.hasLastAmud = 1;
+            component.fillInDapim();
+
+            // index 0 is the placeholder
+            expect(component.dapim[1].value).toBe('2a');
+            expect(component.dapim[2].value).toBe('2b');
+        });
+
+        // REF-04
+
         it('starts with placeholder option', () => {
             component.numberOfDapim = 3;
             component.hasLastAmud = 1;
@@ -200,6 +216,8 @@ describe('gemaraCase', () => {
             expect(component.dapim[0].value).toBe('');
             expect(component.dapim[0].text).toBe('Select a Daf');
         });
+
+        // REF-09
 
         it('uses English numbers by default', () => {
             component.numberOfDapim = 3;
@@ -209,6 +227,8 @@ describe('gemaraCase', () => {
             expect(component.dapim[1].text).toBe('2a');
         });
 
+        // REF-08
+
         it('uses gematriya for Hebrew daf names', () => {
             component.selectedLanguage = 'Hebrew';
             component.numberOfDapim = 3;
@@ -216,6 +236,8 @@ describe('gemaraCase', () => {
             component.fillInDapim();
             expect(component.dapim[1].text).toContain('ב');
         });
+
+        // REF-07
 
         it('always uses English values regardless of language', () => {
             component.selectedLanguage = 'Hebrew';
@@ -227,10 +249,13 @@ describe('gemaraCase', () => {
     });
 
     describe('getInputConditionText', () => {
+        // COND-03
         it('returns value when not marked notRelevant', () => {
             component.theCase.inputConditions.who.value = 'Reuven';
             expect(component.getInputConditionText('who')).toBe('Reuven');
         });
+
+        // COND-04
 
         it('returns localized "Not Relevant" when notRelevant and no tmp', () => {
             component.theCase.inputConditions.who.notRelevant = true;
@@ -238,12 +263,16 @@ describe('gemaraCase', () => {
             expect(component.getInputConditionText('who')).toBe('Not Relevant');
         });
 
+        // COND-04
+
         it('returns Hebrew "Not Relevant" when Hebrew', () => {
             component.selectedLanguage = 'Hebrew';
             component.theCase.inputConditions.who.notRelevant = true;
             component.tmpCase.who = '';
             expect(component.getInputConditionText('who')).toBe('לא רלוונטי');
         });
+
+        // COND-09
 
         it('returns tmpCase value when notRelevant and tmp exists', () => {
             component.theCase.inputConditions.who.notRelevant = true;
@@ -307,6 +336,8 @@ describe('gemaraCase', () => {
             expect(component.theCase.dinType).toBe('');
         });
 
+        // COND-07
+
         it('resetCasePiece clears value and notRelevant', () => {
             component.theCase.inputConditions.who.value = 'Reuven';
             component.theCase.inputConditions.who.notRelevant = true;
@@ -317,6 +348,7 @@ describe('gemaraCase', () => {
     });
 
     describe('updateCase', () => {
+        // COND-03
         it('copies tmpCase value to inputConditions', () => {
             component.tmpCase.who = 'Shimon';
             component.updateCase('who');

@@ -39,6 +39,19 @@ npm run test:e2e:ui      # Playwright in interactive UI mode
 composer install && npm install
 ```
 
+### Spec coverage
+
+```bash
+composer spec            # which docs/spec scenarios have no test referencing them
+```
+
+`docs/spec/` records what the application does today as Gherkin scenarios with stable IDs
+(`DIAG-07`, `SAVE-03`). A test claims a scenario by naming its ID in a test name, docblock or
+comment. `bin/spec-coverage.php` reports any ID nothing references, and exits non-zero — that is
+the completeness check for the suite. Scenarios tagged `@defect` describe intended rather than
+current behavior; their tests are marked incomplete (PHPUnit) or `test.fixme` (Playwright) so they
+stay visible without failing the build.
+
 ### Testing notes
 - **Backend** tests live in `tests/Feature/` and `tests/Unit/` (PHPUnit).
 - **Frontend unit** tests live in `resources/js/__tests__/` (Vitest, config in `vitest.config.js`).

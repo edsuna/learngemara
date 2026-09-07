@@ -56,3 +56,63 @@ test.describe('Cases list page', () => {
         }
     });
 });
+
+/** docs/spec/case-list.md - the parts that need a browser. */
+test.describe('Case list (spec)', () => {
+    test('LIST-09 the active filter is in the URL and is reproducible', async ({ page }) => {
+        await page.context().addCookies([{ name: 'selectedLanguage', value: 'English', url: 'http://127.0.0.1:8000' }]);
+        await page.goto('/gemara_cases?public=1');
+        await page.waitForFunction(
+            () => document.querySelectorAll('select')[0].options.length > 1,
+            null, { timeout: 15000 },
+        );
+
+        // Take the baseline from the URL form, which is stable on load;
+        // counting straight after the dropdown selection races Livewire.
+        await page.goto('/gemara_cases?public=1&masechet=Berakhot');
+        const expectedRows = await page.locator('.case-row').count();
+        expect(expectedRows).toBeGreaterThan(0);
+
+        await page.goto('/gemara_cases?public=1');
+        await page.waitForFunction(
+            () => document.querySelectorAll('select')[0].options.length > 1,
+            null, { timeout: 15000 },
+        );
+        await page.locator('select').first().selectOption('Berakhot');
+
+        // Both the address bar and the result set must converge on the filter.
+        await expect(page).toHaveURL(/masechet=Berakhot/);
+        await expect(page.locator('.case-row')).toHaveCount(expectedRows);
+    });
+
+    test('LIST-15 deleting takes two clicks', async ({ page }) => {
+        const { logIn, FIXTURE } = await import('./support/helpers.js');
+        await logIn(page);
+        await page.goto('/gemara_cases?public=0');
+
+        const { deletableCaseId } = (await import('./support/helpers.js')).fixtures();
+
+        // Target the disposable fixture specifically -- deleting the shared one
+        // would pull it out from under every test that reads it.
+        const row = page.locator('.case-row').filter({ hasText: 'deletable case' }).first();
+        await expect(row).toBeVisible();
+
+        await page.locator(`[wire\\:click="confirmRemove(${deletableCaseId})"]`).click();
+        // Still there: the first click only asks.
+        await expect(row).toBeVisible();
+
+        const confirm = page.locator(`[wire\\:click="removeGemaraCase(${deletableCaseId})"]`);
+        await expect(confirm).toBeVisible();
+        await confirm.click();
+
+        await expect(page.locator('.case-row').filter({ hasText: 'deletable case' })).toHaveCount(0);
+    });
+
+    test('LIST-17 delete controls are not shown to non-owners', async ({ page }) => {
+        await page.goto('/gemara_cases?public=1');
+        await expect(page.locator('.case-row').first()).toBeVisible();
+
+        // A guest sees rows but no delete affordance anywhere.
+        await expect(page.locator('[wire\\:click^="confirmRemove"]')).toHaveCount(0);
+    });
+});

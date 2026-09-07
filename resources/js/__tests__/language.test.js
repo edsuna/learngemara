@@ -14,6 +14,7 @@ describe('languageToggle', () => {
     });
 
     describe('localizedTexts', () => {
+        // LANG-05
         it('returns English texts by default', () => {
             expect(component.localizedTexts.LogIn).toBe('Log in');
             expect(component.localizedTexts.LogOut).toBe('Log out');
@@ -36,16 +37,21 @@ describe('languageToggle', () => {
     });
 
     describe('toggleLanguage', () => {
+        // LANG-02
         it('switches from English to Hebrew', () => {
             component.toggleLanguage();
             expect(component.selectedLanguage).toBe('Hebrew');
         });
+
+        // LANG-02
 
         it('switches from Hebrew to English', () => {
             component.selectedLanguage = 'Hebrew';
             component.toggleLanguage();
             expect(component.selectedLanguage).toBe('English');
         });
+
+        // LANG-03
 
         it('persists language choice to cookie', () => {
             component.toggleLanguage();
@@ -69,9 +75,12 @@ describe('languageToggle', () => {
     });
 
     describe('initial state', () => {
+        // LANG-01
         it('reads language from cookie', () => {
             expect(Cookies.get).toHaveBeenCalledWith('selectedLanguage');
         });
+
+        // LANG-05
 
         it('defaults to English when cookie returns undefined', () => {
             Cookies.get.mockReturnValue('undefined');

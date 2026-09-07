@@ -62,11 +62,19 @@ class E2eFixtures extends Command
         $case->user_id = $user->id;
         $case->save();
 
+        // A second, disposable case: the delete test destroys whatever it
+        // targets, and it must not be the one other tests read from.
+        $deletable = $case->replicate();
+        $deletable->title = self::TAG . ' deletable case';
+        $deletable->user_id = $user->id;
+        $deletable->save();
+
         $this->line(json_encode([
             'userId' => $user->id,
             'email' => self::EMAIL,
             'password' => self::PASSWORD,
             'completeCaseId' => $case->id,
+            'deletableCaseId' => $deletable->id,
         ]));
 
         return self::SUCCESS;

@@ -192,3 +192,34 @@ test.describe('Diagram arrows', () => {
         await expectArrowsConnected(page);
     });
 });
+
+test.describe('Diagram known defects', () => {
+    // DIAG-20 - app.css styles ".gc-with-what", but the blade emits
+    // "gc-withWhat" (input conditions are camelCase), so the rule matches
+    // nothing; there is no ".gc-toWhat" rule at all. Both ovals silently lose
+    // the vertical alignment their neighbours get.
+    test.fixme('DIAG-20 every condition oval is aligned by its own rule', async ({ page }) => {
+        await useLanguage(page, 'English');
+        await fillForm(page, 'act');
+
+        const alignItems = (selector) => page.evaluate(
+            (s) => getComputedStyle(document.querySelector(s)).alignItems, selector,
+        );
+
+        expect(await alignItems('.gc-withWhat')).toBe(await alignItems('.gc-when'));
+        expect(await alignItems('.gc-toWhat')).toBe(await alignItems('.gc-where'));
+    });
+
+    // DIAG-21 - arrowCreate() returns { node, clear }; initArrows() keeps only
+    // node, so every arrow leaks its requestAnimationFrame observer.
+    // resetArrows() removes the SVG but the loop keeps running.
+    test.fixme('DIAG-21 arrow observers are released when arrows are removed', async ({ page }) => {
+        await useLanguage(page, 'English');
+        await fillForm(page, 'act');
+        await page.locator('#gc-act span').filter({ hasText: 'an act' }).first().dblclick();
+        await expect(page.locator('.arrow')).toHaveCount(0);
+
+        const stillObserving = await page.evaluate(() => window.__arrowObservers ?? null);
+        expect(stillObserving).toBe(0);
+    });
+});

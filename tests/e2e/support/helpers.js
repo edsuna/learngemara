@@ -108,3 +108,12 @@ async function arrowsNotReaching(page, tolerance) {
         });
     }, tolerance);
 }
+
+/** The fixture ids published by globalSetup. */
+export function fixtures() {
+    try {
+        return JSON.parse(process.env.E2E_FIXTURES || '{}');
+    } catch {
+        return {};
+    }
+}
