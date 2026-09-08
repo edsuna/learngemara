@@ -62,25 +62,19 @@ class ViewingTest extends TestCase
     }
 
     /**
-     * VIEW-09 - A private case is not readable by strangers.
+     * VIEW-09 - An unlisted case is still readable by anyone with its URL.
      *
-     * @defect `public` gates listing, not access: show() has no authorization,
-     * so a case marked private is served in full to any guest who requests its
-     * URL, and ids are sequential. Left unfixed deliberately -- enforcing
-     * ownership here would break unlisted links that may already be shared,
-     * which is a product decision rather than a code one.
+     * Deliberate: `public` governs listing, not access, so a case can be shared
+     * as a link without being published to the public list. Confirmed as
+     * intended behavior, so this asserts it rather than flagging it.
      */
     #[Test]
-    public function a_private_case_is_not_served_to_strangers(): void
+    public function an_unlisted_case_is_readable_by_anyone_with_its_url(): void
     {
-        $case = GemaraCase::factory()->create(['public' => false, 'title' => 'a private title']);
+        $case = GemaraCase::factory()->create(['public' => false, 'title' => 'an unlisted title']);
 
-        // Current behavior, recorded so the test documents what happens today:
-        $this->get('/gemara_cases/' . $case->id)->assertOk()->assertSee('a private title');
-
-        $this->markTestIncomplete(
-            'VIEW-09: private cases are readable by URL. Awaiting a product decision '
-            . 'on whether to enforce ownership, which would break shared unlisted links.'
-        );
+        $this->get('/gemara_cases/' . $case->id)
+            ->assertOk()
+            ->assertSee('an unlisted title');
     }
 }

@@ -160,7 +160,8 @@ class GemaraCaseTest extends TestCase
     public function show_gemara_case(): void
     {
         $user = User::factory()->create();
-        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+        // Explicit title, for the same reason as modify_gemara_case.
+        $case = GemaraCase::factory()->create(['user_id' => $user->id, 'title' => 'a plain title']);
 
         $response = $this->actingAs($user)->get('/gemara_cases/' . $case->id);
         $response->assertStatus(200)
@@ -172,7 +173,10 @@ class GemaraCaseTest extends TestCase
     public function modify_gemara_case(): void
     {
         $user = User::factory()->create();
-        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+        // An explicit title: the case reaches the page only through toJson() in
+        // x-init, so a Faker title containing a quote or slash is JSON-escaped
+        // differently from assertSee's HTML escaping and flakes intermittently.
+        $case = GemaraCase::factory()->create(['user_id' => $user->id, 'title' => 'a plain title']);
 
         $response = $this->actingAs($user)->get('/gemara_cases/' . $case->id . '/edit');
         $response->assertStatus(200)

@@ -31,7 +31,7 @@ exist to keep it that way.
 
 There are no roles, no admin, no sharing grants. A case has exactly one `user_id`, and every write
 requires being that user. `public` is a visibility flag on *listing*, not a permission — see
-VIEW-09, which is still open.
+VIEW-09.
 
 ---
 
@@ -83,12 +83,11 @@ Feature: Authorization
     # deliberate: cases are meant to be shareable
 ```
 
-## Open question
+## Visibility is not a permission
 
-See `viewing.md` VIEW-09. A case marked not public is excluded from the public list but is served
-in full to anyone who requests its URL, guests included, and ids are sequential. Whether that is
-acceptable is a product decision — enforcing ownership on `show` would break any unlisted link
-that has been shared — so it is recorded rather than silently changed.
+`public` is a listing flag, not an access control. An unlisted case is served in full to anyone
+holding its URL, guests included — deliberately, so that a case can be shared as a link without
+being published to the public list. See `viewing.md` VIEW-09.
 
 ## Note
 

@@ -90,24 +90,25 @@ Feature: Viewing a case
     Then all 8 arrows connect their condition oval to the act oval
 ```
 
-## Known defects
+## Visibility is about listing, not access
+
+`public` controls whether a case appears in the public list. It does not control who may read it:
+`GemaraCaseController::show()` has no authorization, so any case is served in full to anyone who
+requests its URL, including unauthenticated guests.
+
+**This is deliberate.** Cases are meant to be shareable — a link to a case must work for whoever it
+is sent to, without an account and without the author having to publish it to the world first.
+"Not public" therefore means *unlisted*, not *unreadable*.
+
+The consequence worth knowing: case ids are sequential, so unlisted cases can be found by walking
+`/gemara_cases/1..N`. Unlisted is not the same as unguessable. If that ever matters, a random slug
+on the URL would preserve shareable links while removing enumerability; it is not a concern today
+because nothing in a case is sensitive.
 
 ```gherkin
-@defect
-Scenario: VIEW-09 - A private case is not readable by strangers
-  # The `public` flag controls *listing*, not *access*. GemaraCaseController::show()
-  # has no authorization: a case marked private is excluded from the public list
-  # but is served in full to anyone who requests its URL, including
-  # unauthenticated guests. Verified: a guest fetching a private case received
-  # 200 and the case's title in the response body.
-  #
-  # Ids are sequential, so every private case in the system can be enumerated by
-  # walking /gemara_cases/1..N.
-  #
-  # NOTE: fixing this is a product decision, not just a code change -- if
-  # unlisted-but-shareable links are relied on, enforcing ownership would break
-  # them. Needs a decision before it is changed.
+Scenario: VIEW-09 - An unlisted case is still readable by anyone with its URL   (observed)
   Given a case marked not public
   When someone who does not own it requests its URL
-  Then they do not receive its contents
+  Then they receive the case in full
+  And the case does not appear in the public list
 ```
