@@ -64,3 +64,49 @@ test.describe('Saving', () => {
         await expect(page.locator('button[x-text="localizedTexts.saveCaseAs"]')).toBeVisible();
     });
 });
+
+/**
+ * SAVE-16 - the browser half. A rejected save has to say which field failed;
+ * previously the only surface was alert(result.message), a summary string, and
+ * a network failure reported nothing at all.
+ */
+test.describe('Saving failures', () => {
+    test.beforeEach(async ({ page }) => {
+        await useLanguage(page, 'English');
+        await logIn(page);
+    });
+
+    test('SAVE-16 a rejected save names the fields that failed', async ({ page }) => {
+        await page.route('**/gemara_cases', (route) => {
+            if (route.request().method() !== 'POST') return route.fallback();
+            return route.fulfill({
+                status: 422,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    message: 'The given data was invalid.',
+                    errors: { act: ['The act field is required.'], who: ['The who field is required.'] },
+                }),
+            });
+        });
+
+        await fillForm(page, 'conditions');
+        await page.locator('button[x-text="localizedTexts.saveCase"]').click();
+
+        const modal = page.locator('.gc-save-errors');
+        await expect(modal).toBeVisible();
+        await expect(modal).toContainText('The act field is required.');
+        await expect(modal).toContainText('The who field is required.');
+    });
+
+    test('SAVE-16 a network failure is reported rather than swallowed', async ({ page }) => {
+        await page.route('**/gemara_cases', (route) => {
+            if (route.request().method() !== 'POST') return route.fallback();
+            return route.abort('failed');
+        });
+
+        await fillForm(page, 'conditions');
+        await page.locator('button[x-text="localizedTexts.saveCase"]').click();
+
+        await expect(page.locator('.gc-save-errors')).toContainText('could not be saved');
+    });
+});

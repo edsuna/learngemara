@@ -194,11 +194,10 @@ test.describe('Diagram arrows', () => {
 });
 
 test.describe('Diagram known defects', () => {
-    // DIAG-20 - app.css styles ".gc-with-what", but the blade emits
-    // "gc-withWhat" (input conditions are camelCase), so the rule matches
-    // nothing; there is no ".gc-toWhat" rule at all. Both ovals silently lose
-    // the vertical alignment their neighbours get.
-    test.fixme('DIAG-20 every condition oval is aligned by its own rule', async ({ page }) => {
+    // DIAG-20 - the six row-one ovals form a symmetric arc. ".gc-with-what"
+    // matched nothing because the blade emits "gc-withWhat", so that oval sat
+    // flush with the top row instead of between.
+    test('DIAG-20 row one forms a symmetric arc', async ({ page }) => {
         await useLanguage(page, 'English');
         await fillForm(page, 'act');
 
@@ -210,16 +209,28 @@ test.describe('Diagram known defects', () => {
         expect(await alignItems('.gc-toWhat')).toBe(await alignItems('.gc-where'));
     });
 
-    // DIAG-21 - arrowCreate() returns { node, clear }; initArrows() keeps only
-    // node, so every arrow leaks its requestAnimationFrame observer.
-    // resetArrows() removes the SVG but the loop keeps running.
-    test.fixme('DIAG-21 arrow observers are released when arrows are removed', async ({ page }) => {
+    // DIAG-21 - arrowCreate() returns { node, clear }; clear() cancels that
+    // arrow's requestAnimationFrame observer. Keeping only node and removing
+    // the SVG left the loop running, once per arrow per draw.
+    test('DIAG-21 arrow observers are released when arrows are removed', async ({ page }) => {
         await useLanguage(page, 'English');
         await fillForm(page, 'act');
+        expect(await page.evaluate(() => window.arrowCount())).toBe(8);
+
         await page.locator('#gc-act span').filter({ hasText: 'an act' }).first().dblclick();
         await expect(page.locator('.arrow')).toHaveCount(0);
 
-        const stillObserving = await page.evaluate(() => window.__arrowObservers ?? null);
-        expect(stillObserving).toBe(0);
+        // Not just the SVGs: the observers behind them must be released too.
+        expect(await page.evaluate(() => window.arrowCount())).toBe(0);
+    });
+
+    test('DIAG-21 redrawing does not stack a second set of arrows', async ({ page }) => {
+        await useLanguage(page, 'English');
+        await fillForm(page, 'act');
+
+        await page.evaluate(() => { window.initArrows(); window.initArrows(); });
+
+        await expect(page.locator('.arrow')).toHaveCount(8);
+        expect(await page.evaluate(() => window.arrowCount())).toBe(8);
     });
 });

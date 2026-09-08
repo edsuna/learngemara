@@ -111,26 +111,22 @@ Feature: Google sign-in
 ## Known defects
 
 ```gherkin
-@defect
-Scenario: AUTH-36 - An OAuth failure shows an error page
-  # routes/web.php catches the exception and calls dd($e->getMessage()), which
-  # dumps a debug page to the browser. With APP_DEBUG off in production this is
-  # still a dump rather than a handled error, and it exposes the exception text.
+Scenario: AUTH-36 - An OAuth failure is handled, not dumped               (code)
+  # The callback used to dd($e->getMessage()), putting a debug page carrying
+  # the exception text in front of the visitor. It now reports the exception
+  # and returns the user to the login page with a message.
   Given the Google callback fails
   When I am returned to the application
-  Then I see a normal error page
+  Then I am on the login page with an explanation
+  And the exception text is not shown to me
 
-@defect
-Scenario: AUTH-37 - OAuth-created accounts have no usable password
-  # Users created through the Google callback get encrypt('123456dummy') as
-  # their password. Verified: encrypt() uses a random IV, so each call returns
-  # different ciphertext, and the model's 'password' => 'hashed' cast then
-  # bcrypts it. Each such account therefore holds a valid bcrypt hash of a
-  # unique random string -- not a shared or guessable secret, so this is not a
-  # security hole. But the plaintext is unknowable even to the account owner,
-  # so a Google-registered user can never sign in with email and password and
-  # has no signposted route to setting one.
+Scenario: AUTH-37 - A Google-registered user is told how to sign in       (code)
+  # Such an account has no usable password -- a random one is set and
+  # discarded -- so the generic "these credentials do not match" is true but
+  # useless: no password would work, and nothing said so. Login now recognises
+  # a google_id on the account and names the route that does work.
   Given I registered through Google
   When I try to sign in with email and password
-  Then I am told to use Google, or given a way to set a password
+  Then I am told to use Google, or to reset my password to set one
+  And an ordinary account still gets the generic failure message
 ```

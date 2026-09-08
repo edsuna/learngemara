@@ -10,6 +10,8 @@ export default defineConfig({
         baseURL: 'http://127.0.0.1:8000',
         headless: true,
         screenshot: 'only-on-failure',
+        // Watch a run: SLOWMO=400 npx playwright test --headed
+        launchOptions: { slowMo: Number(process.env.SLOWMO || 0) },
     },
     projects: [
         {

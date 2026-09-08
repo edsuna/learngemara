@@ -203,29 +203,58 @@ class SavingTest extends TestCase
     }
 
     /**
-     * SAVE-16 - A server error is reported usefully.
+     * SAVE-16 - A rejected save names the fields that failed.
      *
-     * @defect The only error surface is alert(result.message), so a 422 shows a
-     * summary string with no indication of which field failed, and the .catch()
-     * branch reports nothing at all.
+     * The server half: a 422 must carry a per-field `errors` object, since that
+     * is the only place it says *what* was wrong. The browser half -- that the
+     * user is actually shown them -- is in tests/e2e/saving.spec.js.
      */
     #[Test]
-    public function a_validation_failure_tells_the_user_which_field_failed(): void
+    public function a_validation_failure_names_the_fields_that_failed(): void
     {
-        $this->markTestIncomplete('SAVE-16: known defect, no per-field error surface in the UI.');
+        $payload = $this->payload(['act' => '', 'dinType' => 'not a din type']);
+
+        $this->actingAs(User::factory()->create())
+            ->postJson('/gemara_cases', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['act', 'din_type'])
+            ->assertJsonStructure(['message', 'errors' => ['act', 'din_type']]);
     }
 
     /**
-     * SAVE-17 - Update targets the case named in the URL.
-     *
-     * @defect GemaraCaseController::update() ignores its route-model-bound
-     * instance and re-finds the case by $request['caseId'], then returns the
-     * bound model. authorize() checks caseId so it is not exploitable today,
-     * but the row written and the row returned can differ.
+     * SAVE-17 - Update targets the case named in the URL, not the one named in
+     * the request body.
      */
     #[Test]
     public function update_writes_to_the_case_in_the_url(): void
     {
-        $this->markTestIncomplete('SAVE-17: known defect, update() keys off the request body rather than the URL.');
+        $user = User::factory()->create();
+        $target = GemaraCase::factory()->create(['user_id' => $user->id, 'act' => 'the target act']);
+        $bystander = GemaraCase::factory()->create(['user_id' => $user->id, 'act' => 'the bystander act']);
+
+        // A stale or mismatched caseId in the body must not redirect the write.
+        $payload = $this->payload(['act' => 'the new act', 'caseId' => $bystander->id]);
+
+        $this->actingAs($user)
+            ->putJson('/gemara_cases/' . $target->id, $payload)
+            ->assertStatus(200)
+            ->assertJsonFragment(['id' => $target->id]);
+
+        $this->assertSame('the new act', $target->fresh()->act, 'the URL names the case to write');
+        $this->assertSame('the bystander act', $bystander->fresh()->act, 'no other case may be touched');
+    }
+
+    /** SAVE-17 - An update with no caseId in the body still works. */
+    #[Test]
+    public function update_works_without_a_case_id_in_the_body(): void
+    {
+        $user = User::factory()->create();
+        $case = GemaraCase::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)
+            ->putJson('/gemara_cases/' . $case->id, $this->payload(['act' => 'an updated act']))
+            ->assertStatus(200);
+
+        $this->assertSame('an updated act', $case->fresh()->act);
     }
 }

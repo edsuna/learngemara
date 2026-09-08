@@ -67,12 +67,12 @@ test.describe('Language and direction', () => {
 });
 
 /**
- * REF-10 - known defect. fillInDapim() builds the dapim array once, at masechet
+ * REF-10 - fillInDapim() builds the dapim array at masechet selection, so the
  * selection, using whatever language is active then. Nothing rebuilds it on the
  * togglelanguage event, so the daf dropdown keeps the language it was created
  * in while every other label on the page switches.
  */
-test.fixme('REF-10 switching language relabels the daf list', async ({ page }) => {
+test('REF-10 switching language relabels the daf list', async ({ page }) => {
     await useLanguage(page, 'English');
     await page.goto('/gemara_cases/create');
     await page.waitForFunction(

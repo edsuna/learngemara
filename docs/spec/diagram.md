@@ -183,23 +183,25 @@ Feature: Diagram arrows
 ## Known defects
 
 ```gherkin
-@defect
-Scenario: DIAG-20 - Every condition oval is vertically aligned by its rule
-  # app.css styles ".gc-with-what", but the blade emits class "gc-withWhat"
-  # (input conditions are camelCase), so the rule matches nothing. There is
-  # no ".gc-toWhat" rule at all. Both ovals silently lose their alignment.
+Scenario: DIAG-20 - Row one forms a symmetric arc                       (observed)
+  # The outer pair sits lowest, the middle pair highest, and one pair between.
+  # app.css styled ".gc-with-what" while the blade emits "gc-withWhat" (input
+  # conditions are camelCase), so that rule matched nothing and the oval sat
+  # flush with the top row, breaking the symmetry. "where" and "toWhat"
+  # intentionally have no rule -- the default is the top of the arc.
   Given the diagram is fully rendered
   Then the "withWhat" oval is vertically aligned like the "when" oval
   And the "toWhat" oval is vertically aligned like the "where" oval
 
-@defect
-Scenario: DIAG-21 - Arrow observers are released when arrows are removed
-  # arrowCreate() returns a { node, clear } pair; initArrows() keeps only
-  # node and discards clear, so every arrow leaks its requestAnimationFrame
-  # observer. resetArrows() removes the SVG but the loop keeps running.
-  # Eight per draw; a comparison view showing several diagrams multiplies it.
+Scenario: DIAG-21 - Arrow observers are released when arrows are removed  (observed)
+  # arrowCreate() returns a { node, clear } pair, and clear() cancels that
+  # arrow's requestAnimationFrame observer. Keeping only node leaked one loop
+  # per arrow per draw -- eight each time, multiplied by any view showing
+  # several diagrams. initArrows() is also idempotent now, so redrawing
+  # replaces the arrows rather than stacking a second set behind them.
   Given I have entered an act and then cleared it
   Then no requestAnimationFrame observer for the removed arrows is still running
+  And redrawing produces eight arrows, not sixteen
 ```
 
 ## Notes for reimplementation

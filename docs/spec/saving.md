@@ -135,25 +135,25 @@ Feature: Save validation
     Then the case is created
 ```
 
-## Known defects
+## Reporting a rejected save
+
+The `?` badge only appears while the case is incomplete client-side, which by definition it is not
+once Save has been pressed. A rejected save therefore needs its own channel, and gets one: a 422's
+per-field `errors` object is rendered field by field, and anything else -- a 500, or a network
+failure with no body -- falls back to a generic line. An internal exception message is never shown.
 
 ```gherkin
-@defect
-Scenario: SAVE-16 - A server error is reported usefully
-  # The only error surface is alert(result.message). A 422 returns a Laravel
-  # validation payload whose 'message' is a summary string, so the user gets a
-  # browser alert with no indication of which field failed. The .catch() branch
-  # reports nothing at all -- a network failure silently does nothing.
+Scenario: SAVE-16 - A rejected save names the fields that failed          (observed)
   Given saving fails validation on the server
   When the response comes back
   Then I am shown which fields were rejected
+  And a network failure is reported rather than passing silently
 
-@defect
-Scenario: SAVE-17 - Update targets the case named in the URL
-  # GemaraCaseController::update() ignores its route-model-bound $gemaraCase and
-  # re-finds the case by $request['caseId'], then returns the *bound* model as
-  # JSON. authorize() happens to check caseId, so this is not currently
-  # exploitable, but the write and the response refer to different rows.
+Scenario: SAVE-17 - Update targets the case named in the URL              (code)
+  # update() and authorize() both key off the route-bound case. `caseId` in the
+  # body is the client's own record of it and never decides which row is
+  # written or who may write it.
   Given I PUT to /gemara_cases/{id}
   Then the case updated is the one identified by {id}
+  And no other case is modified
 ```

@@ -167,10 +167,9 @@ test.describe('Amud text lookup', () => {
         await expect(page.locator('body')).toContainText(AMUD_TEXT);
     });
 
-    // CASE-12 - known defect. getAmudText() has no .catch(), so a failed
-    // request leaves amudText unassigned and the modal is gated on it being
-    // truthy: the button appears to do nothing at all.
-    test.fixme('CASE-12 a failed Sefaria lookup tells the user', async ({ page }) => {
+    // CASE-12 - the modal is gated on amudText being truthy, so a failed
+    // request must put a message there or the button silently does nothing.
+    test('CASE-12 a failed Sefaria lookup tells the user', async ({ page }) => {
         await stubSefaria(page, { fail: true });
         await fillForm(page, 'daf', { masechet: 'Berakhot', daf: '2a' });
         await page.locator('button:has(img)').first().click();

@@ -53,9 +53,21 @@ const pieces = {
     },
 };
 
+/**
+ * Arrows currently on the page, each as the { node, clear } pair arrowCreate
+ * returns. `clear` cancels that arrow's requestAnimationFrame observer -- the
+ * loop that keeps it attached to its ovals. Dropping the handle and removing
+ * only the SVG leaves the loop running forever, once per arrow per draw.
+ */
+const liveArrows = [];
+
 export function initArrows() {
+    // Idempotent: drawing without clearing first would stack a second set of
+    // arrows, and a second set of observers, on top of the existing ones.
+    resetArrows();
+
     for (const [key, val] of Object.entries(pieces)) {
-        var arrow = arrowCreate({
+        const arrow = arrowCreate({
             className: "arrow",
             from: {
                 direction: val.fromDirection,
@@ -73,15 +85,37 @@ export function initArrows() {
                 distance: 0.99,
             }
         });
+
         document.body.appendChild(arrow.node);
+        liveArrows.push(arrow);
     }
 }
 
 export function resetArrows() {
+    while (liveArrows.length) {
+        const arrow = liveArrows.pop();
+
+        try {
+            arrow.clear?.();
+        } catch {
+            // Already cancelled, or the anchors are gone. Releasing the
+            // observer is best-effort; the DOM sweep below is not.
+        }
+    }
+
+    // Removal goes through the DOM, not arrow.node: the handle arrowCreate
+    // returns is accepted by appendChild but has no .remove(), so calling it
+    // throws and would abandon the rest of the loop mid-way.
     document.querySelectorAll('.arrow').forEach(e => e.remove());
+}
+
+/** Live arrow count, so the observer bookkeeping is observable from a test. */
+export function arrowCount() {
+    return liveArrows.length;
 }
 
 if (typeof window !== 'undefined') {
     window.initArrows = initArrows;
     window.resetArrows = resetArrows;
+    window.arrowCount = arrowCount;
 }

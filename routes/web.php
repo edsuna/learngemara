@@ -13,6 +13,7 @@ use App\Livewire\Auth\Verify;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/', Home::class)->name('home');
@@ -62,13 +63,23 @@ Route::get('/auth/callback', function () {
                 'name' => $user->name,
                 'email' => $user->email,
                 'google_id' => $user->id,
-                'password' => encrypt('123456dummy')
+                // No usable password: this account signs in through Google.
+                // The model's 'hashed' cast bcrypts whatever is set here, and
+                // the plaintext is random and discarded, so nothing can match
+                // it. AUTH-37 covers telling such a user what to do instead.
+                'password' => Str::random(48),
             ]);
 
             Auth::login($newUser);
             return redirect('/');
         }
-    } catch (Exception $e) {
-        dd($e->getMessage());
+    } catch (Throwable $e) {
+        // Was dd($e->getMessage()), which dumped a debug page carrying the
+        // exception text straight to the visitor. Report it and hand the user
+        // back somewhere they can act.
+        report($e);
+
+        return redirect()->route('login')
+            ->with('error', 'Google sign-in did not complete. Please try again, or sign in with your email and password.');
     }
 });

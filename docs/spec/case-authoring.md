@@ -109,13 +109,10 @@ Feature: Amud text lookup
 ## Known defects
 
 ```gherkin
-@defect
-Scenario: CASE-12 - A failed Sefaria lookup tells the user
-  # getAmudText() has no .catch(). On a network failure or non-JSON response
-  # the promise rejects unhandled, amudText is never assigned, and the modal
-  # is gated on amudText being truthy -- so the button appears to do nothing
-  # at all. Sefaria is a third-party dependency on the open internet; this
-  # will happen.
+Scenario: CASE-12 - A failed Sefaria lookup tells the user               (observed)
+  # The modal is gated on amudText being truthy, so a failure has to put a
+  # message there or the button appears to do nothing at all. Sefaria is a
+  # third party on the open internet; this will happen.
   Given Sefaria is unreachable
   When I press Show Amud Text
   Then I am told the amud text could not be loaded

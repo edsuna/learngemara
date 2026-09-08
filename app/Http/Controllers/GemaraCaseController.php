@@ -56,11 +56,14 @@ class GemaraCaseController extends Controller
 
     public function update(GemaraCaseRequest $request, GemaraCase $gemaraCase)
     {
-        $gemaraCaseData = $request->all();
-        $case = GemaraCase::find($gemaraCaseData['caseId']);
-        if ($case->fill($gemaraCaseData)->save()) {
+        // Write to the case the URL names. This used to re-find the case by
+        // $request['caseId'] and then return the route-bound instance, so the
+        // row written and the row returned could differ; it also threw
+        // outright when caseId was absent from the body.
+        if ($gemaraCase->fill($request->all())->save()) {
             return response()->json($gemaraCase, 200);
         }
+
         return response()->json(['errorMsg' => 'Failed to save update to database'], 500);
     }
 

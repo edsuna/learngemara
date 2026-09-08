@@ -227,6 +227,14 @@
                               'modalContent' => 'validationErrors',
                               'classes' => '',
                               'clickAway' => 'showErrors = false'])
+                    {{-- A rejected save needs its own channel: the badge above
+                         only appears while the case is incomplete client-side,
+                         which by definition it is not once save was pressed. --}}
+                    @include('subviews.modal',
+                             ['showFlag' => 'saveErrors',
+                              'modalContent' => 'saveErrors',
+                              'classes' => 'gc-save-errors',
+                              'clickAway' => 'saveErrors = false'])
                 @else
                     <div x-text="localizedTexts.needLogin"></div>
                 @endauth

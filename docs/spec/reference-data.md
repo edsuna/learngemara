@@ -87,14 +87,11 @@ Feature: Daf generation
 ## Known defects
 
 ```gherkin
-@defect
-Scenario: REF-10 - Switching language relabels the daf list
-  # fillInDapim() builds the dapim array once, at masechet selection, using
-  # whatever language is active at that moment. Nothing rebuilds it on the
-  # togglelanguage event, so the labels are frozen. Verified both ways:
-  # select in English then switch to Hebrew -> labels stay "2a", "2b";
-  # select in Hebrew then switch to English -> labels stay "ב׳.", "ב׳:".
-  # Every other label on the page switches, so this control alone is stale.
+Scenario: REF-10 - Switching language relabels the daf list              (observed)
+  # fillInDapim() bakes the active language into the labels, so the list has
+  # to be rebuilt when the language changes or this one control keeps the
+  # language it was created in while everything around it switches. Option
+  # values are language-independent, so the current selection survives.
   Given I have selected the masechet "Shabbat" in English
   And the daf labels read "2a", "2b", "3a"
   When I switch the display language to Hebrew

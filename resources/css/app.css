@@ -57,7 +57,12 @@ input:invalid, textarea:invalid, select:invalid {
     @apply items-end;
 }
 
-.gc-when, .gc-with-what {
+/* Row one is a symmetric arc: the outer pair sits lowest, the middle pair
+   highest, and this pair between them. Input conditions are camelCase, so the
+   class is .gc-withWhat -- .gc-with-what matched nothing and left that oval
+   flush with the top row. `where` and `toWhat` intentionally have no rule;
+   the default is the top of the arc. */
+.gc-when, .gc-withWhat {
     @apply items-center;
 }
 

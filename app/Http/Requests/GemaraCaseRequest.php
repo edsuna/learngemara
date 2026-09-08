@@ -55,13 +55,19 @@ class GemaraCaseRequest extends FormRequest
 
     public function authorize(): bool
     {
-        if (isset($this->caseId) && $this->caseId) {
+        // Authorize the case being written to. For an update that is the one
+        // the URL names; `caseId` in the body is the client's own record of it
+        // and must not be the thing that decides access.
+        $case = $this->route('gemara_case');
+
+        if (!$case && isset($this->caseId) && $this->caseId) {
             $case = GemaraCase::find($this->caseId);
-            if (!$case || ($case->user_id != Auth::id())) {
+
+            if (!$case) {
                 return false;
             }
         }
 
-        return true;
+        return !$case || $case->user_id === Auth::id();
     }
 }

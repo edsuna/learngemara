@@ -11,6 +11,7 @@ export function gemaraCase() {
         hasLastAmud: false,
         amudText: false,
         showErrors: false,
+        saveErrors: false,
         allowUpdates: true,
         isInit: false,
         saveAs: false,
@@ -90,6 +91,7 @@ export function gemaraCase() {
             amudAlef: 'a',
             amudBet: 'b',
             showAmudText: 'Show Amud Text',
+            amudTextUnavailable: 'The text of this amud could not be loaded. Check your connection and try again.',
             titleLabel: 'Case Title',
             caseWho: 'Who',
             caseHow: 'How',
@@ -104,6 +106,7 @@ export function gemaraCase() {
             notRelevant: "Not Relevant",
             selectDinType: 'Select Din Type',
             saveCase: 'Save',
+            saveFailed: 'The case could not be saved. Check your connection and try again.',
             saveCaseAs: 'Save as New',
             caseMasechetError: 'You must select a Masechet',
             caseDafError: 'You must select the Daf',
@@ -136,6 +139,7 @@ export function gemaraCase() {
             amudAlef: '.',
             amudBet: ':',
             showAmudText: 'הצג עמוד טקסט',
+            amudTextUnavailable: 'לא ניתן לטעון את טקסט העמוד. בדוק את החיבור ונסה שוב.',
             titleLabel: 'כותרת המקרה',
             caseWho: 'מי',
             caseHow: 'איך',
@@ -150,6 +154,7 @@ export function gemaraCase() {
             notRelevant: 'לא רלוונטי',
             selectDinType: 'בחר סוג הדין',
             saveCase: 'שמור',
+            saveFailed: 'לא ניתן לשמור את המקרה. בדוק את החיבור ונסה שוב.',
             saveCaseAs: 'שמור כחדש',
             caseMasechetError: 'עליך לבחור מסכת',
             caseDafError: 'עליך לבחור את הדף',
@@ -302,12 +307,23 @@ export function gemaraCase() {
         getAmudText() {
             let url = "https://www.sefaria.org/api/texts/" + this.theCase.masechet + '.' + this.theCase.daf;
             fetch(url)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Sefaria responded ' + res.status);
+                }
+                return res.json();
+            })
             .then(data => {
                 this.amudText = '';
                 for (let s of data.he) {
                     this.amudText += ' ' + s;
                 }
+            })
+            .catch(() => {
+                // Sefaria is a third party on the open internet, so this will
+                // happen. The modal is gated on amudText being truthy, so
+                // without a message here the button silently does nothing.
+                this.amudText = this.localizedTexts.amudTextUnavailable;
             });
         },
 
@@ -317,6 +333,16 @@ export function gemaraCase() {
 
         toggleLanguage() {
             this.selectedLanguage = (this.selectedLanguage === 'English') ? 'Hebrew' : 'English';
+
+            // The daf list is built once, at masechet selection, and bakes in
+            // the language of that moment -- digits or gematriya. Every other
+            // label on the page is reactive, so without this rebuild the daf
+            // dropdown alone keeps the language it was created in. The option
+            // values are language-independent, so the current selection
+            // survives.
+            if (this.theCase.masechet) {
+                this.fillInDapim();
+            }
         },
 
         resetCase() {
@@ -457,19 +483,52 @@ export function gemaraCase() {
                 },
                 body: JSON.stringify(this.theCase)
             })
-            .then(response => response.json())
-            .then(result => {
-                if (typeof result.message === 'undefined'){
-                    window.location.href = '/gemara_cases/';
+            .then(async response => {
+                if (!response.ok) {
+                    throw await response.json().catch(() => ({}));
                 }
-                else {
-                    alert(result.message);
-                }
-                this.theCase.caseId = caseId;
+                return response.json();
             })
-            .catch((error) => {
+            .then(() => {
                 this.theCase.caseId = caseId;
+                window.location.href = '/gemara_cases/';
+            })
+            .catch(error => {
+                // Restore the id first: "Save as New" zeroes it before the
+                // request, so a failed clone must not leave the form thinking
+                // it is creating rather than editing.
+                this.theCase.caseId = caseId;
+                this.saveErrors = this.formatSaveErrors(error);
             });
+        },
+
+        /**
+         * Turn a failed save into something the user can act on.
+         *
+         * A 422 carries an `errors` object keyed by field, which is the only
+         * place the server says *what* was wrong; the top-level `message` is
+         * just a summary. Anything else -- a 500, or a network failure with no
+         * body at all -- falls back to a generic line, because reporting
+         * nothing is what made this invisible before.
+         */
+        formatSaveErrors(error) {
+            const errors = error && error.errors;
+
+            if (errors && Object.keys(errors).length) {
+                return Object.keys(errors)
+                    .map(field => (this.localizedTexts['case' + field.charAt(0).toUpperCase() + field.slice(1)] || field)
+                        .replace(/<[^>]*>/g, ' ')
+                        .trim() + ': ' + [].concat(errors[field]).join(' '))
+                    .join('<br>');
+            }
+
+            // A server-supplied summary is worth showing; a thrown Error's
+            // message is internal wording like "Failed to fetch" and is not.
+            if (error && !(error instanceof Error) && error.message) {
+                return error.message;
+            }
+
+            return this.localizedTexts.saveFailed;
         },
 
         editGemaraCase(caseId, owner) {
