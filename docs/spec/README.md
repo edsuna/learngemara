@@ -74,3 +74,23 @@ Scenarios are marked with how they were established:
 | [`auth.md`](auth.md) | Login, register, logout, verification, reset, OAuth | AUTH |
 
 All eleven domains are written.
+
+## Reviewing and changing the spec
+
+The spec is reviewed through GitHub pull requests, so review comments live with the repository and
+anyone who can clone it can read the open ones.
+
+**Changing the spec.** Edit the files on a branch and open a PR against `master`. Change the tests in
+the same PR when a scenario's behavior changes, so `composer spec` stays green — a scenario and the
+test that claims it should never disagree on `master`.
+
+**Reviewing the whole spec at once.** A normal PR only shows changed lines, so there is nothing to
+comment on in files that already exist on `master`. For a full read-through, use two branches:
+
+- `spec-review` — the spec as it stands.
+- `spec-review-base` — identical, except `docs/spec/` is removed.
+
+A PR from `spec-review` into `spec-review-base` shows every line of the spec as new, and nothing
+else, so any line can be commented on. **Never merge that PR** — close it when the review is done.
+Resolving a comment means committing the change to `spec-review` and resolving the thread;
+`spec-review` is then merged into `master` through an ordinary PR.
