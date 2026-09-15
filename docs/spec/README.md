@@ -85,12 +85,22 @@ the same PR when a scenario's behavior changes, so `composer spec` stays green �
 test that claims it should never disagree on `master`.
 
 **Reviewing the whole spec at once.** A normal PR only shows changed lines, so there is nothing to
-comment on in files that already exist on `master`. For a full read-through, use two branches:
+comment on in files that already exist on `master`. For a full read-through, build two branches —
+**in this order**, because a PR's head must contain commits its base lacks:
 
-- `spec-review` — the spec as it stands.
-- `spec-review-base` — identical, except `docs/spec/` is removed.
+```bash
+git checkout -b spec-review-base master
+git rm -r docs/spec && git commit -m "Review base: docs/spec removed -- do not merge"
 
-A PR from `spec-review` into `spec-review-base` shows every line of the spec as new, and nothing
-else, so any line can be commented on. **Never merge that PR** — close it when the review is done.
-Resolving a comment means committing the change to `spec-review` and resolving the thread;
-`spec-review` is then merged into `master` through an ordinary PR.
+git checkout -b spec-review               # branched from spec-review-base
+git checkout master -- docs/spec && git commit -m "Restore docs/spec for review"
+```
+
+A PR from `spec-review` into `spec-review-base` then shows every line of the spec as new, and
+nothing else, so any line can be commented on. (Branching the base *from* the head instead leaves
+the head with no commits of its own, and GitHub refuses the PR.)
+
+Resolving a comment means committing the change to `spec-review` and resolving the thread.
+**Never merge the review PR** — close it when the review is done. Carry the result to `master`
+through an ordinary PR, squash-merged: `spec-review` holds a remove/restore pair that nets to
+nothing and is not worth keeping in `master`'s history.
