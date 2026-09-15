@@ -180,7 +180,7 @@ Feature: Diagram arrows
     And all 8 arrows connect their condition oval to the act oval
 ```
 
-## Known defects
+## Layout
 
 ```gherkin
 Scenario: DIAG-20 - Row one forms a symmetric arc                       (observed)
@@ -193,15 +193,29 @@ Scenario: DIAG-20 - Row one forms a symmetric arc                       (observe
   Then the "withWhat" oval is vertically aligned like the "when" oval
   And the "toWhat" oval is vertically aligned like the "where" oval
 
-Scenario: DIAG-21 - Arrow observers are released when arrows are removed  (observed)
-  # arrowCreate() returns a { node, clear } pair, and clear() cancels that
-  # arrow's requestAnimationFrame observer. Keeping only node leaked one loop
-  # per arrow per draw -- eight each time, multiplied by any view showing
-  # several diagrams. initArrows() is also idempotent now, so redrawing
-  # replaces the arrows rather than stacking a second set behind them.
+```
+
+## Known defects
+
+```gherkin
+@defect
+Scenario: DIAG-21 - Arrow observers are released when arrows are removed
+  # Not fixable while arrows-svg draws the arrows. Each arrow is a Preact
+  # component, bundled inside the library, whose requestAnimationFrame loop
+  # ends only when the component unmounts -- and the public API never unmounts
+  # it. The `clear()` that arrowCreate() returns just calls removeChild on the
+  # SVG, and `node` is the DocumentFragment it rendered into. So removing the
+  # arrows leaves their loops running, and every redraw adds eight more.
+  #
+  # Measured in the running app: 288 frame requests per 600 ms with one set of
+  # arrows; still 288 after clearing them; 1152 after four redraws -- while
+  # exactly eight SVGs stay visible the whole time, which is why nothing that
+  # counts arrows can see it.
+  #
+  # The acceptance test counts frame requests directly. Stage 0f, which
+  # replaces the library, must make it pass.
   Given I have entered an act and then cleared it
-  Then no requestAnimationFrame observer for the removed arrows is still running
-  And redrawing produces eight arrows, not sixteen
+  Then nothing is still requesting animation frames on the arrows' behalf
 ```
 
 ## Notes for reimplementation

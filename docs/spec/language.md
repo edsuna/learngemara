@@ -80,11 +80,11 @@ Feature: Language toggle
     And the diagram is still fully revealed
 ```
 
-## Known defects
+## Controls that cache labels
 
-See `reference-data.md` REF-10: the daf dropdown labels are built once at masechet selection and
-are not rebuilt on `togglelanguage`, so that one control keeps the language it was created in
-while everything around it switches.
+A control whose option labels are computed once, rather than bound reactively, has to be rebuilt on
+`togglelanguage` or it will keep the language it was built in. The daf dropdown is one — see
+`reference-data.md` REF-10.
 
 ## Note for the sugya tool
 

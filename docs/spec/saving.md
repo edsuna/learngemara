@@ -28,8 +28,8 @@ This is the only place the user is told why saving is unavailable, so the modal 
 request becomes a create. `caseId` is restored afterwards in both the success and failure paths, so
 a failed clone leaves the form still editing the original.
 
-On success the browser navigates to `/gemara_cases/`. On a response carrying a `message` the raw
-message is shown via `alert()` — that is the entire server-error surface.
+On success the browser navigates to `/gemara_cases/`. A rejected save opens a modal instead — see
+*Reporting a rejected save* below.
 
 ## What the server receives
 

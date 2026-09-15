@@ -106,7 +106,7 @@ Feature: Amud text lookup
     Then the loaded amud text is cleared
 ```
 
-## Known defects
+## Lookup failures
 
 ```gherkin
 Scenario: CASE-12 - A failed Sefaria lookup tells the user               (observed)

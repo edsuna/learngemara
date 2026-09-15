@@ -86,18 +86,17 @@ class GoogleSignInTest extends TestCase
 
         Auth::logout();
 
+        // Assert the specific message, and that it is rendered. A bare
+        // assertHasErrors('email') is satisfied by any failed login, so it
+        // would pass even if every account got the generic message.
         Livewire::test('auth.login')
             ->set('email', 'one@example.com')
             ->set('password', 'anything at all')
             ->call('authenticate')
-            ->assertHasErrors('email');
+            ->assertHasErrors(['email' => trans('auth.google_account')])
+            ->assertSee(trans('auth.google_account'));
 
         $this->assertGuest();
-        $this->assertStringContainsString(
-            'Google',
-            trans('auth.google_account'),
-            'the message must name the route that actually works'
-        );
     }
 
     /** AUTH-37 - An ordinary account still gets the ordinary message. */
@@ -126,13 +125,17 @@ class GoogleSignInTest extends TestCase
         $provider->shouldReceive('user')->andThrow(new \RuntimeException('invalid state'));
         Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
 
-        $response = $this->get('/auth/callback');
-
-        $response->assertRedirect(route('login'));
-        $response->assertSessionHas('error');
+        $this->get('/auth/callback')->assertRedirect(route('login'));
         $this->assertGuest();
 
-        // The exception text must not be handed to the visitor.
-        $this->assertStringNotContainsString('invalid state', (string) session('error'));
+        // Follow the redirect and assert on the page. Checking only that the
+        // session carries a message passed while the login page never rendered
+        // it -- the user saw no explanation at all.
+        $this->followingRedirects()
+            ->get('/auth/callback')
+            ->assertOk()
+            ->assertSee('Sign in to your account')
+            ->assertSee('Google sign-in did not complete')
+            ->assertDontSee('invalid state');
     }
 }

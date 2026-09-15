@@ -19,6 +19,15 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
+            {{-- A message handed over by a redirect -- e.g. a Google sign-in
+                 that did not complete. Field errors are rendered beside their
+                 inputs below; this is for anything that is not about a field. --}}
+            @if (session('error'))
+                <div role="alert" class="mb-6 px-4 py-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md leading-5">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <form wire:submit="authenticate">
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 leading-5">

@@ -26,10 +26,17 @@ rather than shown the form.
 ## Google OAuth
 
 `/auth/google` redirects to Google; `/auth/callback` looks the user up by `google_id` and logs them
-in, or creates a new user with the Google profile's name and email. Two things to know about the
-created account: the password is a fixed dummy string (`encrypt('123456dummy')`), and the callback
-is wrapped in a `try/catch` ending in `dd($e->getMessage())` — an OAuth failure dumps to the
-browser rather than showing an error page.
+in, or creates a new user with the Google profile's name and email.
+
+An account created this way gets a random password that is set and immediately discarded, so it
+has no usable password. Login recognises a `google_id` on the account and tells the user to sign in
+with Google, or to reset their password to set one, rather than reporting their credentials as
+wrong (AUTH-37).
+
+If the callback fails, the exception is reported and the user is returned to the login page with a
+message, which the login page renders above the form. The exception text is never shown (AUTH-36).
+Field-level errors render beside their inputs; the banner is for messages that are not about a
+field.
 
 ---
 
@@ -108,7 +115,7 @@ Feature: Google sign-in
     And they are signed in
 ```
 
-## Known defects
+## Google sign-in failures
 
 ```gherkin
 Scenario: AUTH-36 - An OAuth failure is handled, not dumped               (code)
@@ -117,7 +124,8 @@ Scenario: AUTH-36 - An OAuth failure is handled, not dumped               (code)
   # and returns the user to the login page with a message.
   Given the Google callback fails
   When I am returned to the application
-  Then I am on the login page with an explanation
+  Then I am on the login page
+  And a message above the form explains that Google sign-in did not complete
   And the exception text is not shown to me
 
 Scenario: AUTH-37 - A Google-registered user is told how to sign in       (code)

@@ -84,7 +84,7 @@ Feature: Daf generation
     Then the first three daf labels are "2a", "2b", "3a"
 ```
 
-## Known defects
+## Relabelling on language change
 
 ```gherkin
 Scenario: REF-10 - Switching language relabels the daf list              (observed)

@@ -53,17 +53,9 @@ const pieces = {
     },
 };
 
-/**
- * Arrows currently on the page, each as the { node, clear } pair arrowCreate
- * returns. `clear` cancels that arrow's requestAnimationFrame observer -- the
- * loop that keeps it attached to its ovals. Dropping the handle and removing
- * only the SVG leaves the loop running forever, once per arrow per draw.
- */
-const liveArrows = [];
-
 export function initArrows() {
-    // Idempotent: drawing without clearing first would stack a second set of
-    // arrows, and a second set of observers, on top of the existing ones.
+    // Clear first, so a second call replaces the arrows rather than drawing a
+    // duplicate set of SVGs over the first.
     resetArrows();
 
     for (const [key, val] of Object.entries(pieces)) {
@@ -85,37 +77,28 @@ export function initArrows() {
                 distance: 0.99,
             }
         });
-
         document.body.appendChild(arrow.node);
-        liveArrows.push(arrow);
     }
 }
 
+/**
+ * Remove every arrow SVG from the page.
+ *
+ * This does NOT stop the arrows' observers, and nothing here can (DIAG-21).
+ * arrows-svg renders each arrow as a Preact component, bundled inside the
+ * library, whose requestAnimationFrame loop only ends when that component
+ * unmounts. The public API never unmounts it: the `clear()` returned by
+ * arrowCreate() just calls removeChild on the SVG, and `node` is the
+ * DocumentFragment it was rendered into. Removing the SVG therefore leaves its
+ * loop running, and every redraw adds eight more. Measured: 288 frame requests
+ * per 600 ms with one set of arrows, 1152 after four redraws, while eight SVGs
+ * stay visible throughout. The fix is replacing the library (Stage 0f).
+ */
 export function resetArrows() {
-    while (liveArrows.length) {
-        const arrow = liveArrows.pop();
-
-        try {
-            arrow.clear?.();
-        } catch {
-            // Already cancelled, or the anchors are gone. Releasing the
-            // observer is best-effort; the DOM sweep below is not.
-        }
-    }
-
-    // Removal goes through the DOM, not arrow.node: the handle arrowCreate
-    // returns is accepted by appendChild but has no .remove(), so calling it
-    // throws and would abandon the rest of the loop mid-way.
     document.querySelectorAll('.arrow').forEach(e => e.remove());
-}
-
-/** Live arrow count, so the observer bookkeeping is observable from a test. */
-export function arrowCount() {
-    return liveArrows.length;
 }
 
 if (typeof window !== 'undefined') {
     window.initArrows = initArrows;
     window.resetArrows = resetArrows;
-    window.arrowCount = arrowCount;
 }
