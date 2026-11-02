@@ -52,9 +52,9 @@ test.describe('Course landing page (spec)', () => {
         await expect(page).not.toHaveURL(/\/login/);
     });
 
-    test('COURSE-07 and COURSE-08 the footer link reaches the method section', async ({ page }) => {
+    test('COURSE-07 and COURSE-08 the navigation link reaches the method section', async ({ page }) => {
         await page.goto(COURSE + '/');
-        await page.locator('footer a[href="#about-the-method"]').click();
+        await page.locator('nav a[href="#about-the-method"]').click();
         await expect(page.locator('#about-the-method')).toBeInViewport();
     });
 
@@ -62,6 +62,8 @@ test.describe('Course landing page (spec)', () => {
         await page.goto(COURSE + '/');
         await page.locator('nav a[href$="/sign-in"]').click();
         await expect(page).toHaveURL(COURSE + '/login');
+        // Filling before Livewire has hydrated gets the fields wiped.
+        await page.waitForLoadState('networkidle');
 
         await page.fill('input[type="email"]', FIXTURE.email);
         await page.fill('input[type="password"]', FIXTURE.password);

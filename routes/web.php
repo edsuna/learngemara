@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Course\EntryController;
+use App\Http\Controllers\Course\LandingController;
 use App\Http\Controllers\Home;
 use App\Http\Controllers\GemaraCaseController;
 use App\Livewire\Auth\Login;
@@ -15,6 +17,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+
+// The course address. This group must stay first: the tool's routes below carry no
+// domain, so they match on every host, including this one.
+Route::domain(config('course.domain'))->name('course.')->group(function () {
+    Route::get('/', LandingController::class)->name('landing');
+    Route::get('enroll', [EntryController::class, 'enroll'])->name('enroll');
+    Route::get('sign-in', [EntryController::class, 'signIn'])->name('signin');
+});
 
 Route::get('/', Home::class)->name('home');
 

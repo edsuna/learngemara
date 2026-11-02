@@ -155,9 +155,9 @@ class CourseLandingTest extends TestCase
             ->assertSee(__('course.about_method_body'));
     }
 
-    /** COURSE-08 - The footer offers About the method and the configured Contact address. */
+    /** COURSE-08 - The navigation offers About the method and the configured Contact address. */
     #[Test]
-    public function the_footer_links_to_the_method_and_the_contact_address(): void
+    public function the_navigation_links_to_the_method_and_the_contact_address(): void
     {
         config()->set('course.contact_email', 'contact@example.test');
 
@@ -238,7 +238,7 @@ class CourseLandingTest extends TestCase
             ->set('email', $user->email)
             ->set('password', 'a-good-password')
             ->call('authenticate')
-            ->assertRedirect(self::COURSE . '/');
+            ->assertRedirect(self::COURSE);
 
         $this->assertAuthenticatedAs($user);
     }
@@ -256,7 +256,7 @@ class CourseLandingTest extends TestCase
             ->set('password', 'a-good-password')
             ->set('passwordConfirmation', 'a-good-password')
             ->call('register')
-            ->assertRedirect(self::COURSE . '/');
+            ->assertRedirect(self::COURSE);
 
         $this->assertAuthenticated();
     }

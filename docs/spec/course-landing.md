@@ -83,10 +83,10 @@ Feature: Course landing page
     Then there is an About the method section on the page
 
   # US-W1
-  Scenario: COURSE-08 - The footer offers About the method and Contact        (specified)
+  Scenario: COURSE-08 - The navigation offers About the method and Contact    (specified)
     When I open the course landing page
-    Then the footer links to the About the method section
-    And the footer has a Contact link to the configured email address
+    Then the navigation links to the About the method section
+    And the navigation has a Contact link to the configured email address
     When no contact address is configured
     Then the Contact link is not shown
 
