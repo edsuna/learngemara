@@ -9,6 +9,7 @@ set -e
 #   ./deploy.sh test                      # Deploy master to test
 #   ./deploy.sh test design/bold-colorful # Deploy a branch to test
 #   ./deploy.sh test master setup         # First-time setup on test
+#   ./deploy.sh course course-landing     # Deploy a branch to the course site
 #   ./deploy.sh production                # Deploy master to production
 #   ./deploy.sh production master setup   # First-time setup on production
 #   ./deploy.sh copydb                    # Copy production DB to dev DB (on server)
@@ -43,6 +44,12 @@ GIT_REPO="git@github.com:edsuna/learngemara.git"
 # Test environment
 TEST_PATH="/home/howtolearn/www/dev"
 TEST_URL="https://dev.howtolearngemara.org"
+
+# Course environment (its own checkout, .env and database until first rollout)
+# NOTE: as with production, the subdomain folder itself holds only the ICDSoft
+# placeholder; the app lives one level down and the docroot is .../public.
+COURSE_PATH="/home/howtolearn/www/course/learngemara"
+COURSE_URL="https://course.howtolearngemara.org"
 
 # Production environment
 # NOTE: the prod docroot is /home/howtolearn/www/app/learngemara/public; the
@@ -209,8 +216,11 @@ if [ "$ENV" = "production" ]; then
 elif [ "$ENV" = "test" ]; then
     REMOTE_PATH="$TEST_PATH"
     REMOTE_URL="$TEST_URL"
+elif [ "$ENV" = "course" ]; then
+    REMOTE_PATH="$COURSE_PATH"
+    REMOTE_URL="$COURSE_URL"
 else
-    echo "Usage: $0 [test|production] [branch] [setup]"
+    echo "Usage: $0 [test|course|production] [branch] [setup]"
     echo "       $0 copydb          # production DB -> dev DB (on the server)"
     echo "       $0 copydb local    # production DB -> local $LOCAL_PROD_DB"
     exit 1
