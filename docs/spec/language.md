@@ -4,9 +4,10 @@ The whole UI switches between English and Hebrew. This is not a convenience feat
 matter is Hebrew and Aramaic, and a learner working in Hebrew should not be reading English
 scaffolding around it.
 
-There is **no Laravel localization**. No `lang/` directory, no `__()` calls. Every string lives in
-JavaScript object literals (`englishTexts` / `hebrewTexts`) inside the Alpine component that needs
-it, selected by a `localizedTexts` getter. Two components carry their own copies:
+The tool's interface does not use Laravel localization. Its strings live in JavaScript object
+literals (`englishTexts` / `hebrewTexts`) inside the Alpine component that needs them, selected by a
+`localizedTexts` getter. (`lang/` holds the auth messages and the course pages, which are
+server-rendered.) Two components carry their own copies:
 `resources/js/language.js` (top bar) and `resources/js/gemara_case.js` (everything case-related).
 
 ## How the toggle propagates

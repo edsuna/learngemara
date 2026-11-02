@@ -56,6 +56,8 @@ Scenarios are marked with how they were established:
   behavior is always observed, never inferred, because the code says what was intended and the
   browser says what happens.
 - **(code)** — read from the implementation, for logic with no visible surface.
+- **(specified)** — written before the code, for new work. The scenario, its test and the code land
+  together, so on master it describes what the application does, like every other scenario.
 
 ## Domains
 
@@ -72,5 +74,6 @@ Scenarios are marked with how they were established:
 | [`case-list.md`](case-list.md) | Filters, search, ordering, pagination, delete | LIST |
 | [`authorization.md`](authorization.md) | Ownership rules across every action | AUTHZ |
 | [`auth.md`](auth.md) | Login, register, logout, verification, reset, OAuth | AUTH |
+| [`course-landing.md`](course-landing.md) | Course address, landing page, enrolling | COURSE, ENROLL |
 
-All eleven domains are written.
+The eleven baseline domains are written. New domains are added as the work is specified.
