@@ -58,7 +58,7 @@ class CourseLandingTest extends TestCase
     {
         $html = $this->get(self::COURSE . '/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('images/logo.png', $html);
+        $this->assertStringContainsString('images/course-logo.png', $html);
         $this->assertMatchesRegularExpression(
             '~<h1[^>]*>\s*' . preg_quote(e(__('course.promise')), '~') . '\s*</h1>~',
             $html

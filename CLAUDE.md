@@ -131,6 +131,17 @@ same commit produced different CSS. With explicit sources they build byte-identi
 - **Blade templates:** `resources/views/` with layouts in `layouts/`, Livewire views in `livewire/`
 - **Styles:** Tailwind CSS v4, configured via the `@tailwindcss/vite` plugin (no `tailwind.config.js`); entry stylesheet `resources/css/app.css`
 
+### Color scheme
+Course pages use the named colors defined in the `@theme` block of `resources/css/app.css`, never raw color codes, so a change there reaches every page that uses them. The tool's pages keep their existing colors for now.
+
+| Name | Use for |
+|---|---|
+| `paper` | Main background |
+| `oxblood` | Logo, buttons, selected elements |
+| `oak` | Small accents only. Too light for text on `paper` |
+| `linen` | Lesson panels, gentle separation |
+| `ink` | Text |
+
 ### Data Flow
 Forms submit via AJAX (Alpine.js → POST/PUT to GemaraCaseController → JSON response). Livewire handles the case listing page with real-time filtering. The `/api/tractates` endpoint provides tractate data for form dropdowns.
 

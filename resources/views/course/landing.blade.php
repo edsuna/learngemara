@@ -10,15 +10,15 @@
 
 @section('main')
     <section class="py-8 sm:py-14 text-center">
-        <h1 class="text-3xl sm:text-5xl font-semibold text-gray-900">{{ __('course.promise') }}</h1>
-        <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">{{ __('course.supporting') }}</p>
+        <h1 class="text-3xl sm:text-5xl font-semibold">{{ __('course.promise') }}</h1>
+        <p class="mt-4 text-lg max-w-2xl mx-auto">{{ __('course.supporting') }}</p>
 
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="{{ route('course.enroll') }}" class="w-full sm:w-auto rounded-lg bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-500">{{ __('course.enroll') }}</a>
-            <a href="{{ $toolLink }}" class="w-full sm:w-auto rounded-lg border-2 border-gray-300 px-8 py-3 font-medium text-gray-700 hover:border-gray-400">{{ __('course.use_tool') }}</a>
+            <a href="{{ route('course.enroll') }}" class="w-full sm:w-auto rounded-lg bg-oxblood px-8 py-3 font-semibold text-paper hover:opacity-90">{{ __('course.enroll') }}</a>
+            <a href="{{ $toolLink }}" class="w-full sm:w-auto rounded-lg border-2 border-oak px-8 py-3 font-medium hover:bg-linen">{{ __('course.use_tool') }}</a>
         </div>
 
-        <a href="{{ $exampleLink }}" class="mt-5 inline-block text-indigo-600 underline hover:text-indigo-500">{{ __('course.example_case') }}</a>
+        <a href="{{ $exampleLink }}" class="mt-5 inline-block text-oxblood underline">{{ __('course.example_case') }}</a>
     </section>
 
     @if ($videoUrl)
@@ -27,22 +27,22 @@
         </section>
     @endif
 
-    <section class="py-8 border-t border-gray-200">
-        <h2 class="text-2xl font-semibold text-gray-900">{{ __('course.how_heading') }}</h2>
-        <ol class="mt-4 space-y-3 list-decimal list-inside text-lg text-gray-700">
+    <section class="py-8 border-t border-linen">
+        <h2 class="text-2xl font-semibold">{{ __('course.how_heading') }}</h2>
+        <ol class="mt-4 space-y-3 list-decimal list-inside text-lg">
             <li>{{ __('course.point_1') }}</li>
             <li>{{ __('course.point_2') }}</li>
             <li>{{ __('course.point_3') }}</li>
         </ol>
     </section>
 
-    <section id="about-the-method" class="py-8 border-t border-gray-200 scroll-mt-4">
-        <h2 class="text-2xl font-semibold text-gray-900">{{ __('course.about_method_heading') }}</h2>
-        <p class="mt-4 text-lg text-gray-700">{{ __('course.about_method_body') }}</p>
+    <section id="about-the-method" class="py-8 border-t border-linen scroll-mt-4">
+        <h2 class="text-2xl font-semibold">{{ __('course.about_method_heading') }}</h2>
+        <p class="mt-4 text-lg">{{ __('course.about_method_body') }}</p>
     </section>
 
-    <section class="py-10 border-t border-gray-200 text-center">
-        <p class="text-2xl font-semibold text-gray-900">{{ __('course.closing') }}</p>
-        <a href="{{ route('course.enroll') }}" class="mt-5 inline-block rounded-lg bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-500">{{ __('course.enroll') }}</a>
+    <section class="py-10 border-t border-linen text-center">
+        <p class="text-2xl font-semibold">{{ __('course.closing') }}</p>
+        <a href="{{ route('course.enroll') }}" class="mt-5 inline-block rounded-lg bg-oxblood px-8 py-3 font-semibold text-paper hover:opacity-90">{{ __('course.enroll') }}</a>
     </section>
 @endsection

@@ -4,6 +4,15 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* The site's color scheme. Use these names, never raw color codes. See CLAUDE.md. */
+@theme {
+    --color-paper: #FAF7F0;
+    --color-oxblood: #703B42;
+    --color-oak: #B79A78;
+    --color-linen: #EAE2D6;
+    --color-ink: #302925;
+}
+
 input:invalid, textarea:invalid, select:invalid {
     box-shadow: none;
 }
